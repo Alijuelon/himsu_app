@@ -5,8 +5,8 @@ use App\Http\Controllers\DashboardController;
 // Controller di bawah ini akan kita buat nanti, saya deklarasikan agar route-nya siap
 use App\Http\Controllers\Admin\AnggotaController;
 use App\Http\Controllers\Admin\PembayaranKasController;
-use App\Http\Controllers\Admin\BukuKasController;
 use App\Http\Controllers\Admin\LaporanController;
+use App\Http\Controllers\Admin\VerifikasiAkunController;
 use App\Http\Controllers\Anggota\BayarKasController;
 use App\Http\Controllers\Anggota\RiwayatController;
 use App\Http\Controllers\Admin\PeriodeKasController;
@@ -18,7 +18,7 @@ Route::get('/', function () {
 });
 
 // ROUTE DASHBOARD (Akan diarahkan sesuai role oleh Controller)
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', 'verifikasi'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });
 
@@ -37,6 +37,10 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     
     // Kelola Data Anggota
     Route::resource('anggota', AnggotaController::class);
+    
+    // Verifikasi Akun Anggota
+    Route::get('verifikasi-akun', [VerifikasiAkunController::class, 'index'])->name('verifikasi.index');
+    Route::put('verifikasi-akun/{id}', [VerifikasiAkunController::class, 'verify'])->name('verifikasi.update');
     
     // Kelola Master Periode Kas (TAMBAHKAN INI)
     Route::resource('periode', PeriodeKasController::class);
@@ -58,6 +62,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     });
     // Laporan Keuangan
     Route::get('laporan', [LaporanController::class, 'index'])->name('laporan.index');
+    Route::get('laporan/laba-rugi', [LaporanController::class, 'labaRugi'])->name('laporan.laba-rugi');
     Route::get('laporan/export-pdf', [LaporanController::class, 'exportPdf'])->name('laporan.pdf');
 
     // Notifikasi WA
@@ -75,15 +80,22 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 // ==========================================
 Route::middleware(['auth'])->prefix('anggota')->name('anggota.')->group(function () {
     
-    // Bayar Kas
-    Route::get('bayar', [BayarKasController::class, 'create'])->name('bayar.create');
-    Route::post('bayar', [BayarKasController::class, 'store'])->name('bayar.store');
-    
-    // Riwayat Pribadi
-    Route::get('riwayat', [RiwayatController::class, 'index'])->name('riwayat.index');
-    
-    // Info Saldo (Opsional, bisa ditaruh di Dashboard Anggota saja)
-    Route::get('info-saldo', [RiwayatController::class, 'saldo'])->name('saldo.index');
+    // Halaman Unverified
+    Route::get('unverified', function () {
+        return view('anggota.unverified');
+    })->name('unverified');
+
+    Route::middleware(['verifikasi'])->group(function () {
+        // Bayar Kas
+        Route::get('bayar', [BayarKasController::class, 'create'])->name('bayar.create');
+        Route::post('bayar', [BayarKasController::class, 'store'])->name('bayar.store');
+        
+        // Riwayat Pribadi
+        Route::get('riwayat', [RiwayatController::class, 'index'])->name('riwayat.index');
+        
+        // Info Saldo (Opsional, bisa ditaruh di Dashboard Anggota saja)
+        Route::get('info-saldo', [RiwayatController::class, 'saldo'])->name('saldo.index');
+    });
 
 });
 

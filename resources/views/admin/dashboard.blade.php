@@ -3,6 +3,23 @@
         Dashboard Admin
     </x-slot>
 
+    @if($pendingAccounts > 0)
+        <div class="mb-6 bg-yellow-50 dark:bg-yellow-500/10 border border-yellow-200 dark:border-yellow-500/20 rounded-xl p-4 flex items-center justify-between">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 bg-yellow-100 dark:bg-yellow-500/20 text-yellow-600 rounded-full w-10 h-10 flex items-center justify-center">
+                    <i class="fa-solid fa-user-clock"></i>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-sm font-bold text-yellow-800 dark:text-yellow-400">Verifikasi Akun Pending</h3>
+                    <p class="text-sm text-yellow-700 dark:text-yellow-500 mt-0.5">Terdapat {{ $pendingAccounts }} akun anggota yang menunggu verifikasi admin.</p>
+                </div>
+            </div>
+            <a href="{{ route('admin.verifikasi.index') }}" class="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white text-sm font-bold rounded-lg transition-colors shadow-sm whitespace-nowrap">
+                Lihat <i class="fa-solid fa-arrow-right ml-1"></i>
+            </a>
+        </div>
+    @endif
+
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         <div class="flex items-center p-5 bg-white dark:bg-navy-700 rounded-xl shadow-sm hover:shadow-md transition-shadow border border-transparent dark:border-white/5">
             <div class="p-4 bg-lightBg dark:bg-brand/20 text-brand rounded-full">

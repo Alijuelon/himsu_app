@@ -44,7 +44,9 @@ class DashboardController extends Controller
                 'pengeluaran' => array_values($monthlyPengeluaran),
             ];
 
-            return view('admin.dashboard', compact('totalPemasukan', 'totalPengeluaran', 'saldoKas', 'jumlahAnggota', 'transaksiTerbaru', 'chartData', 'currentYear'));
+            $pendingAccounts = User::where('role', 'anggota')->where('status_verifikasi', 'pending')->count();
+
+            return view('admin.dashboard', compact('totalPemasukan', 'totalPengeluaran', 'saldoKas', 'jumlahAnggota', 'transaksiTerbaru', 'chartData', 'currentYear', 'pendingAccounts'));
             
         } 
         // JIKA YANG LOGIN ADALAH ANGGOTA

@@ -55,4 +55,46 @@ class LaporanController extends Controller
 
         return $pdf->download('Laporan_Keuangan_HIMSU.pdf');
     }
+
+    public function labaRugi(Request $request)
+    {
+        $year = $request->input('year', Carbon::now()->year);
+
+        // Ambil pemasukan dan pengeluaran per bulan pada tahun yang dipilih
+        $pemasukan = BukuKas::where('jenis_transaksi', 'pemasukan')
+            ->whereYear('tanggal', $year)
+            ->selectRaw('MONTH(tanggal) as bulan, SUM(nominal) as total')
+            ->groupBy('bulan')
+            ->pluck('total', 'bulan')->toArray();
+
+        $pengeluaran = BukuKas::where('jenis_transaksi', 'pengeluaran')
+            ->whereYear('tanggal', $year)
+            ->selectRaw('MONTH(tanggal) as bulan, SUM(nominal) as total')
+            ->groupBy('bulan')
+            ->pluck('total', 'bulan')->toArray();
+
+        // Siapkan array data 1-12 bulan
+        $labaRugiData = [];
+        $totalLabaRugi = 0;
+        $totalPemasukanTahun = 0;
+        $totalPengeluaranTahun = 0;
+
+        for ($i = 1; $i <= 12; $i++) {
+            $in = $pemasukan[$i] ?? 0;
+            $out = $pengeluaran[$i] ?? 0;
+            $laba = $in - $out;
+
+            $labaRugiData[$i] = [
+                'pemasukan' => $in,
+                'pengeluaran' => $out,
+                'laba' => $laba
+            ];
+
+            $totalPemasukanTahun += $in;
+            $totalPengeluaranTahun += $out;
+            $totalLabaRugi += $laba;
+        }
+
+        return view('admin.laporan.laba-rugi', compact('year', 'labaRugiData', 'totalPemasukanTahun', 'totalPengeluaranTahun', 'totalLabaRugi'));
+    }
 }

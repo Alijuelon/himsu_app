@@ -35,6 +35,14 @@
             <i class="fa-solid fa-users w-5 text-center text-lg"></i>
             <span class="mx-3">Data Anggota</span>
         </x-nav-link>
+
+        <x-nav-link :href="route('admin.verifikasi.index')" :active="request()->routeIs('admin.verifikasi.*')" class="flex items-center px-4 py-3 {{ request()->routeIs('admin.verifikasi.*') ? 'bg-lightBg dark:bg-white/5 text-brand dark:text-brand font-semibold' : 'text-gray-500 dark:text-gray-400 font-medium hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }} rounded-xl transition-colors relative w-full border-none">
+            @if(request()->routeIs('admin.verifikasi.*'))
+                <div class="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-1 bg-brand rounded-l-full"></div>
+            @endif
+            <i class="fa-solid fa-user-check w-5 text-center text-lg"></i>
+            <span class="mx-3">Verifikasi Akun</span>
+        </x-nav-link>
         <x-nav-link :href="route('admin.periode.index')" :active="request()->routeIs('admin.periode.*')" class="flex items-center px-4 py-3 {{ request()->routeIs('admin.periode.*') ? 'bg-lightBg dark:bg-white/5 text-brand dark:text-brand font-semibold' : 'text-gray-500 dark:text-gray-400 font-medium hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }} rounded-xl transition-colors relative w-full border-none">
             @if(request()->routeIs('admin.periode.*'))
                 <div class="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-1 bg-brand rounded-l-full"></div>
@@ -66,12 +74,20 @@
             <span class="mx-3">Pengeluaran Kas</span>
         </x-nav-link>
 
-        <x-nav-link :href="route('admin.laporan.index')" :active="request()->routeIs('admin.laporan.*')" class="flex items-center px-4 py-3 {{ request()->routeIs('admin.laporan.*') ? 'bg-lightBg dark:bg-white/5 text-brand dark:text-brand font-semibold' : 'text-gray-500 dark:text-gray-400 font-medium hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }} rounded-xl transition-colors relative w-full border-none">
-            @if(request()->routeIs('admin.laporan.*'))
+        <x-nav-link :href="route('admin.laporan.index')" :active="request()->routeIs('admin.laporan.index') || request()->routeIs('admin.laporan.pdf')" class="flex items-center px-4 py-3 {{ request()->routeIs('admin.laporan.index') || request()->routeIs('admin.laporan.pdf') ? 'bg-lightBg dark:bg-white/5 text-brand dark:text-brand font-semibold' : 'text-gray-500 dark:text-gray-400 font-medium hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }} rounded-xl transition-colors relative w-full border-none">
+            @if(request()->routeIs('admin.laporan.index') || request()->routeIs('admin.laporan.pdf'))
                 <div class="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-1 bg-brand rounded-l-full"></div>
             @endif
             <i class="fa-solid fa-chart-pie w-5 text-center text-lg"></i>
             <span class="mx-3">Laporan Keuangan</span>
+        </x-nav-link>
+
+        <x-nav-link :href="route('admin.laporan.laba-rugi')" :active="request()->routeIs('admin.laporan.laba-rugi')" class="flex items-center px-4 py-3 {{ request()->routeIs('admin.laporan.laba-rugi') ? 'bg-lightBg dark:bg-white/5 text-brand dark:text-brand font-semibold' : 'text-gray-500 dark:text-gray-400 font-medium hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }} rounded-xl transition-colors relative w-full border-none">
+            @if(request()->routeIs('admin.laporan.laba-rugi'))
+                <div class="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-1 bg-brand rounded-l-full"></div>
+            @endif
+            <i class="fa-solid fa-scale-balanced w-5 text-center text-lg"></i>
+            <span class="mx-3">Laba Rugi</span>
         </x-nav-link>
 
         <p class="px-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3 mt-4">WhatsApp Gateway</p>
