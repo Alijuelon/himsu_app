@@ -44,6 +44,7 @@ class PeriodeKasController extends Controller
             'bulan' => 'required|integer|between:1,12',
             'tahun' => 'required|integer|min:2020',
             'nominal_wajib' => 'required|numeric|min:0',
+            'deadline' => 'nullable|date',
             'status' => 'required|in:aktif,tutup',
         ]);
 
@@ -74,6 +75,7 @@ class PeriodeKasController extends Controller
             'bulan' => 'required|integer|between:1,12',
             'tahun' => 'required|integer|min:2020',
             'nominal_wajib' => 'required|numeric|min:0',
+            'deadline' => 'nullable|date',
             'status' => 'required|in:aktif,tutup',
         ]);
 

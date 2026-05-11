@@ -15,6 +15,7 @@ class PeriodeKas extends Model
         'bulan',
         'tahun',
         'nominal_wajib',
+        'deadline',
         'status',
     ];
 

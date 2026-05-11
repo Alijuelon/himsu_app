@@ -11,19 +11,34 @@ use Illuminate\Support\Facades\Storage;
 
 class BayarKasController extends Controller
 {
-    // Menampilkan Form Pembayaran
     public function create()
     {
+        $userId = Auth::id();
+
+        // Ambil periode yang sudah dibayar atau pending oleh user ini
+        $periodeSudahDibayar = PembayaranKas::where('anggota_id', $userId)
+            ->whereIn('status', ['pending', 'diterima'])
+            ->pluck('periode_id');
+
         // Ambil data periode kas yang statusnya masih 'aktif'
-        $periodeAktif = PeriodeKas::where('status', 'aktif')->orderBy('tahun', 'desc')->orderBy('bulan', 'desc')->get();
-        
+        $periodeAktif = PeriodeKas::where('status', 'aktif')
+            ->whereNotIn('id', $periodeSudahDibayar)
+            ->orderBy('tahun', 'desc')->orderBy('bulan', 'desc')
+            ->get();
+            
+        // Ambil tagihan terlewat (periode tutup yang belum dibayar)
+        $tagihanTerlewat = PeriodeKas::where('status', 'tutup')
+            ->whereNotIn('id', $periodeSudahDibayar)
+            ->orderBy('tahun', 'desc')->orderBy('bulan', 'desc')
+            ->get();
+            
         $namaBulan = [
             1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 
             5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus', 
             9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
         ];
 
-        return view('anggota.bayar.create', compact('periodeAktif', 'namaBulan'));
+        return view('anggota.bayar.create', compact('periodeAktif', 'tagihanTerlewat', 'namaBulan'));
     }
 
     // Memproses Data Pembayaran & Upload Bukti Transfer

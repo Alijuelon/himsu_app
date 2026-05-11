@@ -19,14 +19,29 @@
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Periode Tagihan <span class="text-red-500">*</span></label>
                     <select name="periode_id" required class="w-full py-2.5 px-4 bg-lightBg dark:bg-navy-800 border border-transparent dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand text-gray-700 dark:text-white transition-all">
                         <option value="">-- Pilih Periode --</option>
-                        @foreach($periodeAktif as $periode)
-                        <option value="{{ $periode->id }}" {{ old('periode_id') == $periode->id ? 'selected' : '' }}>
-                            {{ $namaBulan[$periode->bulan] }} {{ $periode->tahun }} - (Wajib: Rp {{ number_format($periode->nominal_wajib, 0, ',', '.') }})
-                        </option>
-                        @endforeach
+                        
+                        @if($periodeAktif->isNotEmpty())
+                            <optgroup label="Tagihan Bulan Ini (Aktif)">
+                                @foreach($periodeAktif as $periode)
+                                <option value="{{ $periode->id }}" {{ old('periode_id') == $periode->id ? 'selected' : '' }}>
+                                    {{ $namaBulan[$periode->bulan] }} {{ $periode->tahun }} - (Wajib: Rp {{ number_format($periode->nominal_wajib, 0, ',', '.') }}) {{ $periode->deadline ? ' - Tenggat: ' . \Carbon\Carbon::parse($periode->deadline)->format('d M Y') : '' }}
+                                </option>
+                                @endforeach
+                            </optgroup>
+                        @endif
+
+                        @if(isset($tagihanTerlewat) && $tagihanTerlewat->isNotEmpty())
+                            <optgroup label="Tagihan Terlewat (Belum Dibayar)">
+                                @foreach($tagihanTerlewat as $periode)
+                                <option value="{{ $periode->id }}" {{ old('periode_id') == $periode->id ? 'selected' : '' }}>
+                                    {{ $namaBulan[$periode->bulan] }} {{ $periode->tahun }} - (Wajib: Rp {{ number_format($periode->nominal_wajib, 0, ',', '.') }}) {{ $periode->deadline ? ' - Tenggat: ' . \Carbon\Carbon::parse($periode->deadline)->format('d M Y') : '' }}
+                                </option>
+                                @endforeach
+                            </optgroup>
+                        @endif
                     </select>
-                    @if($periodeAktif->isEmpty())
-                    <p class="text-xs text-red-500 mt-2"><i class="fa-solid fa-triangle-exclamation"></i> Belum ada tagihan aktif bulan ini.</p>
+                    @if($periodeAktif->isEmpty() && (empty($tagihanTerlewat) || $tagihanTerlewat->isEmpty()))
+                    <p class="text-xs text-red-500 mt-2"><i class="fa-solid fa-triangle-exclamation"></i> Tidak ada tagihan yang perlu dibayar.</p>
                     @endif
                     <x-input-error :messages="$errors->get('periode_id')" class="mt-2 text-red-500 text-xs" />
                 </div>

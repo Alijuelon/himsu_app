@@ -33,6 +33,7 @@
                     <tr class="text-gray-400 dark:text-gray-400 text-xs tracking-wide uppercase border-b border-gray-100 dark:border-white/10">
                         <th class="py-3 px-4 font-medium">Bulan & Tahun</th>
                         <th class="py-3 px-4 font-medium">Nominal Wajib</th>
+                        <th class="py-3 px-4 font-medium">Deadline</th>
                         <th class="py-3 px-4 font-medium">Status</th>
                         <th class="py-3 px-4 font-medium text-center">Aksi</th>
                     </tr>
@@ -45,6 +46,9 @@
                             </td>
                             <td class="py-4 px-4 font-bold text-darkText dark:text-white">
                                 Rp {{ number_format($item->nominal_wajib, 0, ',', '.') }}
+                            </td>
+                            <td class="py-4 px-4">
+                                {{ $item->deadline ? \Carbon\Carbon::parse($item->deadline)->format('d M Y') : '-' }}
                             </td>
                             <td class="py-4 px-4">
                                 @if($item->status == 'aktif')

@@ -130,5 +130,60 @@
 
         </div>
     </div>
+    
+    @if(Auth::check() && Auth::user()->role === 'anggota')
+    @php
+        $userId = Auth::id();
+        $periodeSudahDibayar = \App\Models\PembayaranKas::where('anggota_id', $userId)
+            ->whereIn('status', ['pending', 'diterima'])
+            ->pluck('periode_id');
+
+        $unpaidDeadlines = \App\Models\PeriodeKas::where('status', 'aktif')
+            ->whereNotNull('deadline')
+            ->whereNotIn('id', $periodeSudahDibayar)
+            ->orderBy('deadline', 'asc')
+            ->get();
+            
+        $hasUrgent = false;
+        $urgentMessage = '';
+        foreach($unpaidDeadlines as $p) {
+            $daysLeft = \Carbon\Carbon::now()->startOfDay()->diffInDays(\Carbon\Carbon::parse($p->deadline)->startOfDay(), false);
+            if ($daysLeft <= 3) {
+                $hasUrgent = true;
+                if ($daysLeft < 0) {
+                    $urgentMessage = 'Terdapat tagihan kas yang MELEWATI BATAS WAKTU ('.\Carbon\Carbon::parse($p->deadline)->format('d M Y').'). Segera lakukan pembayaran!';
+                } else if ($daysLeft == 0) {
+                    $urgentMessage = 'HARI INI adalah batas waktu pembayaran tagihan kas Anda. Mohon segera melunasi.';
+                } else {
+                    $urgentMessage = 'Terdapat tagihan kas yang akan jatuh tempo dalam '.$daysLeft.' hari ('.\Carbon\Carbon::parse($p->deadline)->format('d M Y').').';
+                }
+                break;
+            }
+        }
+    @endphp
+    
+    @if($hasUrgent && !session('notified_deadline'))
+        @php
+            session(['notified_deadline' => true]);
+        @endphp
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Peringatan Deadline Kas',
+                    text: '{{ $urgentMessage }}',
+                    confirmButtonText: 'Bayar Sekarang',
+                    showCancelButton: true,
+                    cancelButtonText: 'Nanti',
+                    confirmButtonColor: '#4318FF'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "{{ route('anggota.bayar.create') }}";
+                    }
+                });
+            });
+        </script>
+    @endif
+    @endif
 </body>
 </html>
