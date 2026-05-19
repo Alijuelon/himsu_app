@@ -3,114 +3,121 @@
         Form Pembayaran Kas
     </x-slot>
 
-    <div class="max-w-3xl mx-auto bg-white dark:bg-navy-700 rounded-xl shadow-sm p-6 sm:p-8 border border-transparent dark:border-white/5 transition-colors">
-
-        <div class="mb-6 pb-4 border-b border-gray-100 dark:border-white/10">
-            <h3 class="text-lg font-bold text-darkText dark:text-white">Upload Bukti Transfer</h3>
-            <p class="text-sm text-gray-400">Silakan pilih tagihan dan unggah bukti pembayaran Anda (Maksimal 2MB).</p>
+    <div class="max-w-4xl mx-auto" x-data="{ tab: '{{ old('jenis_pembayaran', 'biasa') }}' }">
+        <!-- Tabs Navigation -->
+        <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 bg-white/50 dark:bg-navy-800/50 p-1.5 rounded-xl mb-6 shadow-sm border border-gray-100 dark:border-white/5 w-full sm:w-max">
+            <button @click="tab = 'biasa'" :class="tab === 'biasa' ? 'bg-white dark:bg-navy-700 text-brand shadow-sm font-bold' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 font-medium'" class="px-6 py-2.5 rounded-lg text-sm transition-all duration-200 w-full sm:w-auto">
+                <i class="fa-solid fa-money-bill-wave mr-2"></i> Pembayaran Bulan Ini
+            </button>
+            <button @click="tab = 'tagihan'" :class="tab === 'tagihan' ? 'bg-white dark:bg-navy-700 text-red-500 shadow-sm font-bold' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 font-medium'" class="px-6 py-2.5 rounded-lg text-sm transition-all duration-200 w-full sm:w-auto">
+                <i class="fa-solid fa-file-invoice-dollar mr-2"></i> Tagihan Terlewat
+                @if(isset($tagihanTerlewat) && $tagihanTerlewat->count() > 0)
+                <span class="ml-1 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{{ $tagihanTerlewat->count() }}</span>
+                @endif
+            </button>
         </div>
 
-        <form action="{{ route('anggota.bayar.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
-            @csrf
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Periode Tagihan <span class="text-red-500">*</span></label>
-                    <select name="periode_id" required class="w-full py-2.5 px-4 bg-lightBg dark:bg-navy-800 border border-transparent dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand text-gray-700 dark:text-white transition-all">
-                        <option value="">-- Pilih Periode --</option>
-                        
-                        @if($periodeAktif->isNotEmpty())
-                            <optgroup label="Tagihan Bulan Ini (Aktif)">
-                                @foreach($periodeAktif as $periode)
-                                <option value="{{ $periode->id }}" {{ old('periode_id') == $periode->id ? 'selected' : '' }}>
-                                    {{ $namaBulan[$periode->bulan] }} {{ $periode->tahun }} - (Wajib: Rp {{ number_format($periode->nominal_wajib, 0, ',', '.') }}) {{ $periode->deadline ? ' - Tenggat: ' . \Carbon\Carbon::parse($periode->deadline)->format('d M Y') : '' }}
-                                </option>
-                                @endforeach
-                            </optgroup>
-                        @endif
-
-                        @if(isset($tagihanTerlewat) && $tagihanTerlewat->isNotEmpty())
-                            <optgroup label="Tagihan Terlewat (Belum Dibayar)">
-                                @foreach($tagihanTerlewat as $periode)
-                                <option value="{{ $periode->id }}" {{ old('periode_id') == $periode->id ? 'selected' : '' }}>
-                                    {{ $namaBulan[$periode->bulan] }} {{ $periode->tahun }} - (Wajib: Rp {{ number_format($periode->nominal_wajib, 0, ',', '.') }}) {{ $periode->deadline ? ' - Tenggat: ' . \Carbon\Carbon::parse($periode->deadline)->format('d M Y') : '' }}
-                                </option>
-                                @endforeach
-                            </optgroup>
-                        @endif
-                    </select>
-                    @if($periodeAktif->isEmpty() && (empty($tagihanTerlewat) || $tagihanTerlewat->isEmpty()))
-                    <p class="text-xs text-red-500 mt-2"><i class="fa-solid fa-triangle-exclamation"></i> Tidak ada tagihan yang perlu dibayar.</p>
-                    @endif
-                    <x-input-error :messages="$errors->get('periode_id')" class="mt-2 text-red-500 text-xs" />
+        <!-- Form Pembayaran Biasa -->
+        <div x-show="tab === 'biasa'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" style="display: none;">
+            <div class="bg-white dark:bg-navy-700 rounded-xl shadow-sm p-6 sm:p-8 border border-transparent dark:border-white/5 transition-colors">
+                <div class="mb-6 pb-4 border-b border-gray-100 dark:border-white/10">
+                    <h3 class="text-lg font-bold text-darkText dark:text-white">Pembayaran Kas Bulan Ini</h3>
+                    <p class="text-sm text-gray-400">Silakan bayar kas rutin Anda yang sedang aktif pada periode ini.</p>
                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Nominal Transfer (Rp) <span class="text-red-500">*</span></label>
-                    <input type="number" name="jumlah_bayar" value="{{ old('jumlah_bayar') }}" required min="1000" placeholder="Contoh: 50000" class="w-full py-2.5 px-4 bg-lightBg dark:bg-navy-800 border border-transparent dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand text-gray-700 dark:text-white transition-all">
-                    <x-input-error :messages="$errors->get('jumlah_bayar')" class="mt-2 text-red-500 text-xs" />
-                </div>
-            </div>
-            <div x-data="{ fileUrl: null, fileName: '', isPdf: false }">
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Bukti Transfer (JPG, PNG, PDF) <span class="text-red-500">*</span></label>
-
-                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-xl hover:border-brand dark:hover:border-brand transition-colors bg-lightBg dark:bg-navy-800 relative group overflow-hidden">
-
-                    <div class="space-y-1 text-center" x-show="!fileUrl">
-                        <i class="fa-solid fa-cloud-arrow-up text-4xl text-gray-400 mb-3 group-hover:text-brand transition-colors"></i>
-                        <div class="flex text-sm text-gray-600 dark:text-gray-400 justify-center">
-                            <label for="file-upload" class="relative cursor-pointer bg-transparent rounded-md font-bold text-brand hover:text-brandHover focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-brand">
-                                <span>Pilih file gambar atau PDF</span>
-                            </label>
-                            <p class="pl-1">atau drag & drop</p>
+                <form action="{{ route('anggota.bayar.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                    @csrf
+                    <input type="hidden" name="jenis_pembayaran" value="biasa">
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Periode Aktif <span class="text-red-500">*</span></label>
+                            <select name="periode_id" required class="w-full py-2.5 px-4 bg-lightBg dark:bg-navy-800 border border-transparent dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand text-gray-700 dark:text-white transition-all">
+                                <option value="">-- Pilih Periode --</option>
+                                @if($periodeAktif->isNotEmpty())
+                                    @foreach($periodeAktif as $periode)
+                                    <option value="{{ $periode->id }}" {{ old('periode_id') == $periode->id ? 'selected' : '' }}>
+                                        {{ $namaBulan[$periode->bulan] }} {{ $periode->tahun }} - (Wajib: Rp {{ number_format($periode->nominal_wajib, 0, ',', '.') }})
+                                        {{ $periode->deadline ? ' - Tenggat: ' . \Carbon\Carbon::parse($periode->deadline)->format('d M Y') : '' }}
+                                    </option>
+                                    @endforeach
+                                @endif
+                            </select>
+                            @if($periodeAktif->isEmpty())
+                            <p class="text-xs text-green-500 mt-2"><i class="fa-solid fa-check-circle"></i> Anda sudah melunasi semua kas untuk periode aktif saat ini.</p>
+                            @endif
+                            <x-input-error :messages="$errors->get('periode_id')" class="mt-2 text-red-500 text-xs" />
                         </div>
-                        <p class="text-xs text-gray-500">PNG, JPG, JPEG, PDF maksimal 2MB</p>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Nominal Transfer (Rp) <span class="text-red-500">*</span></label>
+                            <input type="number" name="jumlah_bayar" value="{{ old('jumlah_bayar') }}" required min="1000" placeholder="Contoh: 50000" class="w-full py-2.5 px-4 bg-lightBg dark:bg-navy-800 border border-transparent dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand text-gray-700 dark:text-white transition-all">
+                            <x-input-error :messages="$errors->get('jumlah_bayar')" class="mt-2 text-red-500 text-xs" />
+                        </div>
                     </div>
+                    
+                    @include('anggota.bayar.partials.form-upload')
 
-                    <div x-show="fileUrl" style="display: none;" class="relative w-full text-center">
-
-                        <img x-show="!isPdf" :src="fileUrl" alt="Preview" class="mx-auto h-48 object-contain rounded-lg shadow-sm border border-gray-200 dark:border-white/10">
-
-                        <div x-show="isPdf" class="flex flex-col items-center justify-center h-48 bg-gray-50 dark:bg-navy-900 rounded-lg border border-gray-200 dark:border-white/10">
-                            <i class="fa-solid fa-file-pdf text-5xl text-red-500 mb-3"></i>
-                            <p class="text-sm font-bold text-gray-700 dark:text-gray-300 px-4 truncate" x-text="fileName"></p>
-                            <p class="text-xs text-gray-500 mt-1">Dokumen PDF siap diunggah</p>
-                        </div>
-
-                        <button type="button" @click="fileUrl = null; fileName = ''; isPdf = false; document.getElementById('file-upload').value = ''" class="absolute -top-3 -right-3 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 shadow-md">
-                            <i class="fa-solid fa-xmark"></i>
+                    <div class="pt-4 flex items-center justify-end space-x-3 border-t border-gray-100 dark:border-white/10">
+                        <a href="{{ route('dashboard') }}" class="px-5 py-2.5 text-sm font-medium text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition">Batal</a>
+                        <button type="submit" class="bg-brand text-white text-sm font-bold px-6 py-2.5 rounded-xl hover:bg-brandHover transition shadow-sm" {{ $periodeAktif->isEmpty() ? 'disabled' : '' }}>
+                            Kirim Bukti Pembayaran
                         </button>
                     </div>
+                </form>
+            </div>
+        </div>
 
-                    <input id="file-upload" name="bukti_transfer" type="file" class="sr-only" accept=".jpeg, .png, .jpg, .pdf" required
-                        @change="
-                            const file = $event.target.files[0];
-                            if (file) {
-                                fileName = file.name;
-                                isPdf = file.type === 'application/pdf';
-                                fileUrl = URL.createObjectURL(file);
-                            }
-                        ">
+        <!-- Form Pembayaran Tagihan -->
+        <div x-show="tab === 'tagihan'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" style="display: none;">
+            <div class="bg-white dark:bg-navy-700 rounded-xl shadow-sm p-6 sm:p-8 border border-red-500/20 transition-colors">
+                <div class="mb-6 pb-4 border-b border-gray-100 dark:border-white/10">
+                    <h3 class="text-lg font-bold text-red-500 dark:text-red-400">Pembayaran Tagihan Terlewat</h3>
+                    <p class="text-sm text-gray-400">Silakan lunasi tagihan kas Anda yang sudah melewati batas waktu (periode tutup).</p>
                 </div>
-                <x-input-error :messages="$errors->get('bukti_transfer')" class="mt-2 text-red-500 text-xs" />
-            </div>
-            <div class="bg-blue-50 dark:bg-blue-500/10 p-4 rounded-xl border border-blue-100 dark:border-blue-500/20 flex items-start mt-4">
-                <i class="fa-solid fa-circle-info text-blue-500 mt-0.5 mr-3"></i>
-                <div class="text-sm text-blue-800 dark:text-blue-300">
-                    <p class="font-bold mb-1">Informasi Transfer Rekening:</p>
-                    <p>Bank Riau Kepri: <strong>123-456-7890</strong> a.n HIMSU Bengkalis</p>
-                    <p>Dana / OVO: <strong>0812-3456-7890</strong></p>
-                </div>
-            </div>
 
-            <div class="pt-4 flex items-center justify-end space-x-3 border-t border-gray-100 dark:border-white/10">
-                <a href="{{ route('dashboard') }}" class="px-5 py-2.5 text-sm font-medium text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition">Batal</a>
-                <button type="submit" class="bg-brand text-white text-sm font-bold px-6 py-2.5 rounded-xl hover:bg-brandHover transition shadow-sm">
-                    Kirim Bukti Bayar
-                </button>
+                <form action="{{ route('anggota.bayar.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                    @csrf
+                    <input type="hidden" name="jenis_pembayaran" value="tagihan">
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Pilih Tagihan <span class="text-red-500">*</span></label>
+                            <select name="periode_id" required class="w-full py-2.5 px-4 bg-lightBg dark:bg-navy-800 border border-transparent dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-700 dark:text-white transition-all">
+                                <option value="">-- Pilih Tagihan Terlewat --</option>
+                                @if(isset($tagihanTerlewat) && $tagihanTerlewat->isNotEmpty())
+                                    @foreach($tagihanTerlewat as $periode)
+                                    <option value="{{ $periode->id }}" {{ old('periode_id') == $periode->id ? 'selected' : '' }}>
+                                        {{ $namaBulan[$periode->bulan] }} {{ $periode->tahun }} - (Wajib: Rp {{ number_format($periode->nominal_wajib, 0, ',', '.') }})
+                                        {{ $periode->deadline ? ' - Tenggat: ' . \Carbon\Carbon::parse($periode->deadline)->format('d M Y') : '' }}
+                                    </option>
+                                    @endforeach
+                                @endif
+                            </select>
+                            @if(empty($tagihanTerlewat) || $tagihanTerlewat->isEmpty())
+                            <p class="text-xs text-green-500 mt-2"><i class="fa-solid fa-check-circle"></i> Anda tidak memiliki tagihan kas yang terlewat.</p>
+                            @endif
+                            <x-input-error :messages="$errors->get('periode_id')" class="mt-2 text-red-500 text-xs" />
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Nominal Transfer (Rp) <span class="text-red-500">*</span></label>
+                            <input type="number" name="jumlah_bayar" value="{{ old('jumlah_bayar') }}" required min="1000" placeholder="Contoh: 50000" class="w-full py-2.5 px-4 bg-lightBg dark:bg-navy-800 border border-transparent dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-700 dark:text-white transition-all">
+                            <x-input-error :messages="$errors->get('jumlah_bayar')" class="mt-2 text-red-500 text-xs" />
+                        </div>
+                    </div>
+                    
+                    @include('anggota.bayar.partials.form-upload')
+
+                    <div class="pt-4 flex items-center justify-end space-x-3 border-t border-gray-100 dark:border-white/10">
+                        <a href="{{ route('dashboard') }}" class="px-5 py-2.5 text-sm font-medium text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition">Batal</a>
+                        <button type="submit" class="bg-red-500 text-white text-sm font-bold px-6 py-2.5 rounded-xl hover:bg-red-600 transition shadow-sm" {{ (empty($tagihanTerlewat) || $tagihanTerlewat->isEmpty()) ? 'disabled' : '' }}>
+                            Lunasi Tagihan
+                        </button>
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
 
     </div>
 </x-app-layout>
