@@ -109,6 +109,24 @@
                         </div>
 
                         <div>
+                            <x-input-label for="jabatan" :value="__('Jabatan / Divisi')" />
+                            <x-text-input 
+                                id="jabatan" 
+                                name="jabatan" 
+                                type="text" 
+                                class="mt-2 block w-full rounded-2xl 
+                                       bg-white dark:bg-navy-700 
+                                       border-gray-300 dark:border-white/25 
+                                       text-gray-900 dark:text-white 
+                                       placeholder:text-gray-400 dark:placeholder:text-gray-300
+                                       focus:border-indigo-500 dark:focus:border-indigo-400"
+                                :value="old('jabatan', $user->jabatan)" 
+                                placeholder="Cth: Anggota, Divisi Kominfo"
+                            />
+                            <x-input-error class="mt-2" :messages="$errors->get('jabatan')" />
+                        </div>
+
+                        <div>
                             <x-input-label for="alamat" :value="__('Alamat Lengkap')" />
                             <textarea 
                                 id="alamat" 

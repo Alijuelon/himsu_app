@@ -42,7 +42,7 @@
                         <tr class="border-b border-gray-50 dark:border-white/5 hover:bg-gray-50/50 dark:hover:bg-white/5 transition">
                             <td class="py-4 px-4">
                                 <p class="font-bold text-darkText dark:text-white">{{ $item->nama_lengkap }}</p>
-                                <p class="text-xs text-gray-400">{{ $item->username ?? '-' }}</p>
+                                <p class="text-xs text-gray-400">{{ $item->username ?? '-' }} &bull; <span class="font-semibold text-brand">{{ $item->jabatan ?? 'Anggota' }}</span></p>
                             </td>
                             <td class="py-4 px-4">
                                 <p class="font-medium text-brand dark:text-brandHover">{{ $item->email }}</p>

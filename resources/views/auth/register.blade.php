@@ -40,6 +40,21 @@
             <x-input-error :messages="$errors->get('email')" class="mt-1 text-red-500 text-xs font-semibold" />
         </div>
 
+        <div class="space-y-2">
+            <label for="jabatan" class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                Jabatan / Divisi <span class="text-gray-400 font-normal text-xs">(Opsional)</span>
+            </label>
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <i class="fa-solid fa-briefcase text-gray-400"></i>
+                </div>
+                <input id="jabatan" type="text" name="jabatan" value="{{ old('jabatan') }}" autocomplete="organization-title" 
+                    class="w-full py-3.5 pl-11 pr-4 bg-gray-50 dark:bg-navy-900 border border-transparent hover:border-gray-200 focus:border-transparent dark:border-white/10 dark:hover:border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand font-medium text-gray-800 dark:text-white transition-all placeholder-gray-400 shadow-sm" 
+                    placeholder="Contoh: Anggota Biasa, Divisi Kominfo, dll">
+            </div>
+            <x-input-error :messages="$errors->get('jabatan')" class="mt-1 text-red-500 text-xs font-semibold" />
+        </div>
+
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div class="space-y-2">
                 <label for="password" class="block text-sm font-semibold text-gray-700 dark:text-gray-300">

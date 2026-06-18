@@ -58,6 +58,7 @@
                         <th class="py-3 px-4 font-medium">Tanggal</th>
                         <th class="py-3 px-4 font-medium">Kategori</th>
                         <th class="py-3 px-4 font-medium">Keterangan</th>
+                        <th class="py-3 px-4 font-medium text-center">Bukti</th>
                         <th class="py-3 px-4 font-medium text-right">Nominal</th>
                         <th class="py-3 px-4 font-medium text-center">Jenis</th>
                     </tr>
@@ -78,6 +79,16 @@
                                 {{ Str::limit($item->keterangan, 50) ?: '-' }}
                             </td>
                             
+                            <td class="py-4 px-4 text-center">
+                                @if($item->bukti_nota)
+                                    <a href="{{ asset('storage/bukti_kas/' . $item->bukti_nota) }}" target="_blank" class="inline-flex items-center justify-center p-2 bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-500/20 transition" title="Lihat Bukti">
+                                        <i class="fa-solid fa-file-invoice"></i>
+                                    </a>
+                                @else
+                                    <span class="text-xs text-gray-400">-</span>
+                                @endif
+                            </td>
+
                             <td class="py-4 px-4 font-bold text-right whitespace-nowrap {{ $item->jenis_transaksi === 'pemasukan' ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400' }}">
                                 {{ $item->jenis_transaksi === 'pemasukan' ? '+' : '-' }} Rp {{ number_format($item->nominal, 0, ',', '.') }}
                             </td>
@@ -96,7 +107,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="py-8 text-center text-gray-400">Belum ada mutasi arus kas yang tercatat.</td>
+                            <td colspan="6" class="py-8 text-center text-gray-400">Belum ada mutasi arus kas yang tercatat.</td>
                         </tr>
                     @endforelse
 

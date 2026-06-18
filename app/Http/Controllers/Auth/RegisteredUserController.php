@@ -37,6 +37,7 @@ class RegisteredUserController extends Controller
             'kecamatan' => ['required', 'string', 'max:255'],
             'desa' => ['required', 'string', 'max:255'],
             'alamat' => ['required', 'string'],
+            'jabatan' => ['nullable', 'string', 'max:255'],
         ]);
 
         $user = User::create([
@@ -48,6 +49,7 @@ class RegisteredUserController extends Controller
             'kecamatan' => $request->kecamatan,
             'desa' => $request->desa,
             'alamat' => $request->alamat,
+            'jabatan' => $request->jabatan,
         ]);
 
         event(new Registered($user));

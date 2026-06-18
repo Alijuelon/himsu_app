@@ -31,6 +31,7 @@ class User extends Authenticatable
         'alamat',
         'status_verifikasi',
         'tipe_anggota',
+        'jabatan',
     ];
 
     /**

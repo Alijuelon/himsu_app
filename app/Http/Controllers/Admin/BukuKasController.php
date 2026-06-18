@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\BukuKas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class BukuKasController extends Controller
 {
@@ -54,16 +55,29 @@ class BukuKasController extends Controller
             'tanggal'         => 'required|date',
             'nominal'         => 'required|numeric|min:1',
             'keterangan'      => 'nullable|string',
+            'bukti_nota'      => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:6144',
+        ], [
+            'bukti_nota.max' => 'Ukuran file bukti maksimal 6MB.',
+            'bukti_nota.mimes' => 'Format file bukti harus berupa PDF, JPG, JPEG, atau PNG.',
         ]);
 
-        BukuKas::create([
+        $data = [
             'jenis_transaksi' => $request->jenis_transaksi,
             'kategori'        => $request->kategori,
             'tanggal'         => $request->tanggal,
             'nominal'         => $request->nominal,
             'keterangan'      => $request->keterangan,
             'user_id'         => Auth::id(), // ID Admin yang mencatat
-        ]);
+        ];
+
+        if ($request->hasFile('bukti_nota')) {
+            $file = $request->file('bukti_nota');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->storeAs('public/bukti_kas', $filename);
+            $data['bukti_nota'] = $filename;
+        }
+
+        BukuKas::create($data);
 
         return redirect()->back()->with('success', 'Transaksi ' . $request->jenis_transaksi . ' berhasil dicatat!');
     }
@@ -78,14 +92,31 @@ class BukuKasController extends Controller
             'tanggal'    => 'required|date',
             'nominal'    => 'required|numeric|min:1',
             'keterangan' => 'nullable|string',
+            'bukti_nota' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:6144',
+        ], [
+            'bukti_nota.max' => 'Ukuran file bukti maksimal 6MB.',
+            'bukti_nota.mimes' => 'Format file bukti harus berupa PDF, JPG, JPEG, atau PNG.',
         ]);
 
-        $transaksi->update([
+        $data = [
             'kategori'   => $request->kategori,
             'tanggal'    => $request->tanggal,
             'nominal'    => $request->nominal,
             'keterangan' => $request->keterangan,
-        ]);
+        ];
+
+        if ($request->hasFile('bukti_nota')) {
+            // Delete old file if exists
+            if ($transaksi->bukti_nota && Storage::exists('public/bukti_kas/' . $transaksi->bukti_nota)) {
+                Storage::delete('public/bukti_kas/' . $transaksi->bukti_nota);
+            }
+            $file = $request->file('bukti_nota');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->storeAs('public/bukti_kas', $filename);
+            $data['bukti_nota'] = $filename;
+        }
+
+        $transaksi->update($data);
 
         return redirect()->back()->with('success', 'Data transaksi berhasil diperbarui!');
     }
@@ -95,6 +126,11 @@ class BukuKasController extends Controller
     {
         $transaksi = BukuKas::findOrFail($id);
         $jenis = $transaksi->jenis_transaksi;
+
+        if ($transaksi->bukti_nota && Storage::exists('public/bukti_kas/' . $transaksi->bukti_nota)) {
+            Storage::delete('public/bukti_kas/' . $transaksi->bukti_nota);
+        }
+
         $transaksi->delete();
 
         return redirect()->back()->with('success', 'Data ' . $jenis . ' berhasil dihapus!');

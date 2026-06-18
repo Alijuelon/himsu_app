@@ -26,6 +26,7 @@ class ProfileUpdateRequest extends FormRequest
             ],
             'no_hp' => ['nullable', 'string', 'max:20'],
             'alamat' => ['nullable', 'string', 'max:500'],
+            'jabatan' => ['nullable', 'string', 'max:255'],
             'email' => [
                 'required',
                 'string',
