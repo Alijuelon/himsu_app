@@ -15,8 +15,10 @@ class BukuKasController extends Controller
         $query = BukuKas::where('jenis_transaksi', 'pemasukan')->with('pencatat');
 
         if ($request->has('search') && $request->search != '') {
-            $query->where('kategori', 'like', '%' . $request->search . '%')
+            $query->where(function($q) use ($request) {
+                $q->where('kategori', 'like', '%' . $request->search . '%')
                   ->orWhere('keterangan', 'like', '%' . $request->search . '%');
+            });
         }
 
         $pemasukan = $query->orderBy('tanggal', 'desc')->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
@@ -31,8 +33,10 @@ class BukuKasController extends Controller
         $query = BukuKas::where('jenis_transaksi', 'pengeluaran')->with('pencatat');
 
         if ($request->has('search') && $request->search != '') {
-            $query->where('kategori', 'like', '%' . $request->search . '%')
+            $query->where(function($q) use ($request) {
+                $q->where('kategori', 'like', '%' . $request->search . '%')
                   ->orWhere('keterangan', 'like', '%' . $request->search . '%');
+            });
         }
 
         $pengeluaran = $query->orderBy('tanggal', 'desc')->orderBy('created_at', 'desc')->paginate(10)->withQueryString();

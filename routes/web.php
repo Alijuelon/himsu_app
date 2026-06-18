@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\AnggotaController;
 use App\Http\Controllers\Admin\PembayaranKasController;
 use App\Http\Controllers\Admin\LaporanController;
 use App\Http\Controllers\Admin\VerifikasiAkunController;
+use App\Http\Controllers\Admin\BukuKasController;
 use App\Http\Controllers\Anggota\BayarKasController;
 use App\Http\Controllers\Anggota\RiwayatController;
 use App\Http\Controllers\Admin\PeriodeKasController;
