@@ -43,8 +43,10 @@ class BayarKasController extends Controller
             5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus', 
             9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
         ];
+        
+        $rekeningBank = \App\Models\RekeningBank::all();
 
-        return view('anggota.bayar.create', compact('tagihanTerlewat', 'tagihanMendatang', 'namaBulan', 'bulanIni', 'tahunIni'));
+        return view('anggota.bayar.create', compact('tagihanTerlewat', 'tagihanMendatang', 'namaBulan', 'bulanIni', 'tahunIni', 'rekeningBank'));
     }
 
     // Memproses Data Pembayaran & Upload Bukti Transfer

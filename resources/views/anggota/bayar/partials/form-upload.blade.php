@@ -45,7 +45,16 @@
     <i class="fa-solid fa-circle-info text-blue-500 mt-0.5 mr-3"></i>
     <div class="text-sm text-blue-800 dark:text-blue-300">
         <p class="font-bold mb-1">Informasi Transfer Rekening:</p>
-        <p>Bank Riau Kepri: <strong>123-456-7890</strong> a.n HIMSU Bengkalis</p>
-        <p>Dana / OVO: <strong>0812-3456-7890</strong></p>
+        @if(isset($rekeningBank) && $rekeningBank->isNotEmpty())
+            @foreach($rekeningBank as $bank)
+                <p>{{ $bank->nama_bank }}: <strong>{{ $bank->no_rekening }}</strong> 
+                @if($bank->atas_nama)
+                    a.n {{ $bank->atas_nama }}
+                @endif
+                </p>
+            @endforeach
+        @else
+            <p>Admin belum mengatur informasi rekening bank.</p>
+        @endif
     </div>
 </div>

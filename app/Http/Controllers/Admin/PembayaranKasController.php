@@ -116,4 +116,52 @@ class PembayaranKasController extends Controller
             return redirect()->back()->with('error', 'Terjadi kesalahan sistem: ' . $e->getMessage());
         }
     }
+
+    // Mengirim Ulang Notifikasi WA untuk Pembayaran yang sudah diverifikasi
+    public function resendNotif(Request $request, $id)
+    {
+        try {
+            $pembayaran = PembayaranKas::with(['anggota', 'periode'])->findOrFail($id);
+
+            if ($pembayaran->status === 'pending') {
+                return redirect()->back()->with('error', 'Pembayaran belum diverifikasi.');
+            }
+
+            $waSetting = WaSetting::first();
+            if ($waSetting && $waSetting->is_active && $pembayaran->anggota && $pembayaran->anggota->no_hp) {
+                $template = $pembayaran->status === 'diterima' ? $waSetting->template_pembayaran_diterima : $waSetting->template_pembayaran_ditolak;
+                
+                if (!empty($template)) {
+                    $namaBulanArr = [
+                        1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 
+                        5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus', 
+                        9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+                    ];
+                    
+                    $message = WhatsAppService::buildMessage($template, [
+                        'nama' => $pembayaran->anggota->nama_lengkap,
+                        'bulan' => $namaBulanArr[$pembayaran->periode->bulan] ?? $pembayaran->periode->bulan,
+                        'tahun' => $pembayaran->periode->tahun,
+                        'nominal' => number_format($pembayaran->jumlah_bayar, 0, ',', '.'),
+                        'status' => strtoupper($pembayaran->status),
+                    ]);
+                    
+                    $response = WhatsAppService::sendMessage($pembayaran->anggota->no_hp, $message);
+                    
+                    if ($response && isset($response['status']) && $response['status']) {
+                        return redirect()->back()->with('success', 'Notifikasi WhatsApp berhasil dikirim ulang ke anggota.');
+                    } else {
+                        $reason = $response['reason'] ?? 'Gagal dari server Fonnte';
+                        return redirect()->back()->with('error', 'Gagal mengirim WA: ' . $reason);
+                    }
+                } else {
+                    return redirect()->back()->with('error', 'Template pesan WA belum diatur.');
+                }
+            } else {
+                return redirect()->back()->with('error', 'WA Gateway belum aktif atau anggota tidak memiliki nomor HP valid.');
+            }
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan sistem: ' . $e->getMessage());
+        }
+    }
 }

@@ -125,21 +125,27 @@
             </div>
         </div>
 
-        <!-- Dropdown WA Gateway -->
-        @php $isWaActive = request()->routeIs('admin.wa.*'); @endphp
+        <!-- Dropdown Sistem & Pengaturan -->
+        @php $isWaActive = request()->routeIs('admin.wa.*') || request()->routeIs('admin.rekening.*'); @endphp
         <div x-data="{ open: {{ $isWaActive ? 'true' : 'false' }} }" class="space-y-1 mt-2">
             <button @click="open = !open" class="flex items-center justify-between px-4 py-3 w-full rounded-xl transition-colors font-medium border-none {{ $isWaActive ? 'bg-lightBg dark:bg-white/5 text-brand dark:text-brand font-semibold' : 'text-gray-500 dark:text-gray-400 hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }}">
                 <div class="flex items-center relative">
                     @if($isWaActive)
                         <div class="absolute -left-4 top-1/2 -translate-y-1/2 h-8 w-1 bg-brand rounded-r-full"></div>
                     @endif
-                    <i class="fa-brands fa-whatsapp w-5 text-center text-lg"></i>
-                    <span class="mx-3">WA Gateway</span>
+                    <i class="fa-solid fa-gear w-5 text-center text-lg"></i>
+                    <span class="mx-3">Sistem & Pengaturan</span>
                 </div>
                 <i class="fa-solid fa-chevron-down text-xs transition-transform duration-300" :class="open ? 'rotate-180' : ''"></i>
             </button>
             <div x-show="open" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-2" style="display: none;" class="pl-11 pr-4 py-1 space-y-1 relative">
                 <div class="absolute left-[1.35rem] top-0 bottom-2 w-px bg-gray-200 dark:bg-white/10"></div>
+                
+                <a href="{{ route('admin.rekening.index') }}" class="relative flex items-center px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('admin.rekening.*') ? 'text-brand dark:text-brand font-semibold bg-gray-50 dark:bg-white/5' : 'text-gray-500 dark:text-gray-400 hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }}">
+                    @if(request()->routeIs('admin.rekening.*')) <div class="absolute -left-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-brand"></div> @endif
+                    <i class="fa-solid fa-building-columns w-5 text-center mr-2"></i>
+                    Rekening Pembayaran
+                </a>
                 
                 <a href="{{ route('admin.wa.settings') }}" class="relative flex items-center px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('admin.wa.settings') ? 'text-brand dark:text-brand font-semibold bg-gray-50 dark:bg-white/5' : 'text-gray-500 dark:text-gray-400 hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }}">
                     @if(request()->routeIs('admin.wa.settings')) <div class="absolute -left-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-brand"></div> @endif

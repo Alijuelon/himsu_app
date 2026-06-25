@@ -56,26 +56,38 @@
                             </td>
                             
                             <td class="py-4 px-4 text-center">
-                                <div x-data="{ openImage: false }">
-                                    <button @click="openImage = true" class="relative group block mx-auto overflow-hidden rounded-lg w-16 h-16 border-2 border-gray-200 dark:border-navy-600 hover:border-brand transition">
-                                        <img src="{{ asset('storage/' . $item->bukti_transfer) }}" alt="Bukti" class="object-cover w-full h-full" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
-                                        <div class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
-                                            <i class="fa-solid fa-magnifying-glass text-white text-xs"></i>
-                                        </div>
-                                    </button>
-
-                                    <template x-teleport="body">
-                                        <div x-show="openImage" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                                            <div x-show="openImage" @click="openImage = false" class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm transition-opacity"></div>
-                                            <div x-show="openImage" class="relative max-w-3xl w-full">
-                                                <button @click="openImage = false" class="absolute -top-10 right-0 text-white hover:text-gray-300">
-                                                    <i class="fa-solid fa-xmark text-2xl"></i>
-                                                </button>
-                                                <img src="{{ asset('storage/' . $item->bukti_transfer) }}" class="w-full h-auto rounded-xl shadow-2xl max-h-[80vh] object-contain bg-black/50" onerror="this.src='https://via.placeholder.com/600?text=Gambar+Tidak+Ditemukan'">
+                                @php 
+                                    $ext = pathinfo($item->bukti_transfer, PATHINFO_EXTENSION); 
+                                    $isPdf = strtolower($ext) === 'pdf';
+                                @endphp
+                                
+                                @if($isPdf)
+                                    <a href="{{ asset('storage/' . $item->bukti_transfer) }}" target="_blank" class="flex flex-col items-center justify-center p-2 border-2 border-red-200 dark:border-red-900/50 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors text-red-500 w-16 h-16 mx-auto group">
+                                        <i class="fa-solid fa-file-pdf text-2xl group-hover:scale-110 transition-transform"></i>
+                                        <span class="text-[9px] mt-1 font-bold uppercase">Lihat PDF</span>
+                                    </a>
+                                @else
+                                    <div x-data="{ openImage: false }">
+                                        <button @click="openImage = true" class="relative group block mx-auto overflow-hidden rounded-lg w-16 h-16 border-2 border-gray-200 dark:border-navy-600 hover:border-brand transition">
+                                            <img src="{{ asset('storage/' . $item->bukti_transfer) }}" alt="Bukti" class="object-cover w-full h-full" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
+                                            <div class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                                                <i class="fa-solid fa-magnifying-glass text-white text-xs"></i>
                                             </div>
-                                        </div>
-                                    </template>
-                                </div>
+                                        </button>
+
+                                        <template x-teleport="body">
+                                            <div x-show="openImage" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                                                <div x-show="openImage" @click="openImage = false" class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm transition-opacity"></div>
+                                                <div x-show="openImage" class="relative max-w-3xl w-full">
+                                                    <button @click="openImage = false" class="absolute -top-10 right-0 text-white hover:text-gray-300">
+                                                        <i class="fa-solid fa-xmark text-2xl"></i>
+                                                    </button>
+                                                    <img src="{{ asset('storage/' . $item->bukti_transfer) }}" class="w-full h-auto rounded-xl shadow-2xl max-h-[80vh] object-contain bg-black/50" onerror="this.src='https://via.placeholder.com/600?text=Gambar+Tidak+Ditemukan'">
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                @endif
                             </td>
 
                             <td class="py-4 px-4 text-center">
@@ -121,7 +133,15 @@
                                         </form>
                                     </div>
                                 @else
-                                    <span class="text-gray-400 text-xs italic">Selesai diverifikasi</span>
+                                    <div class="flex flex-col items-center">
+                                        <span class="text-gray-400 text-xs italic mb-2">Selesai diverifikasi</span>
+                                        <form action="{{ route('admin.pembayaran.resend-notif', $item->id) }}" method="POST">
+                                            @csrf
+                                            <button type="submit" class="py-1.5 px-2 bg-brand/10 text-brand hover:bg-brand/20 dark:bg-brand/20 dark:text-brand dark:hover:bg-brand/30 rounded-lg transition font-bold text-[10px] flex items-center shadow-sm" onclick="return confirm('Kirim ulang notifikasi WhatsApp kuitansi/penolakan ke anggota ini?')">
+                                                <i class="fa-brands fa-whatsapp mr-1"></i> Kirim Ulang Notif
+                                            </button>
+                                        </form>
+                                    </div>
                                 @endif
                             </td>
 

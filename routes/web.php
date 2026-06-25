@@ -51,6 +51,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // Kelola Pembayaran (Verifikasi dll)
     Route::get('pembayaran', [PembayaranKasController::class, 'index'])->name('pembayaran.index');
     Route::put('pembayaran/{id}/verifikasi', [PembayaranKasController::class, 'verifikasi'])->name('pembayaran.verifikasi');
+    Route::post('pembayaran/{id}/resend-notif', [PembayaranKasController::class, 'resendNotif'])->name('pembayaran.resend-notif');
     
    // Buku Kas (Pemasukan & Pengeluaran)
     Route::prefix('buku-kas')->name('bukukas.')->group(function () {
@@ -61,6 +62,14 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::post('store', [BukuKasController::class, 'store'])->name('store');
         Route::put('{id}/update', [BukuKasController::class, 'update'])->name('update');
         Route::delete('{id}/destroy', [BukuKasController::class, 'destroy'])->name('destroy');
+    });
+
+    // Pengaturan Rekening Bank
+    Route::prefix('rekening')->name('rekening.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\RekeningBankController::class, 'index'])->name('index');
+        Route::post('/store', [\App\Http\Controllers\Admin\RekeningBankController::class, 'store'])->name('store');
+        Route::put('/{id}/update', [\App\Http\Controllers\Admin\RekeningBankController::class, 'update'])->name('update');
+        Route::delete('/{id}/destroy', [\App\Http\Controllers\Admin\RekeningBankController::class, 'destroy'])->name('destroy');
     });
     // Laporan Keuangan
     Route::get('laporan', [LaporanController::class, 'index'])->name('laporan.index');
