@@ -1,28 +1,43 @@
 <x-app-layout>
     <x-slot name="header">
-        Master Periode Tagihan Kas
+        Pembayaran Kas
     </x-slot>
 
     <div class="bg-white dark:bg-navy-700 rounded-xl shadow-sm p-6 border border-transparent dark:border-white/5 transition-colors">
         
-        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4" x-data="{ search: '{{ request('search') }}' }">
-            <h3 class="text-lg font-bold text-darkText dark:text-white">Daftar Periode Kas</h3>
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-5" x-data>
+            <div>
+                <h3 class="text-xl font-bold text-darkText dark:text-white">Daftar Pembayaran Kas</h3>
+                <p class="text-sm text-gray-500 mt-1">Kelola data tagihan dan status kas anggota.</p>
+            </div>
             
-            <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
-                <form action="{{ route('admin.periode.index') }}" method="GET" class="relative w-full sm:w-64">
-                    <input type="text" name="search" x-model="search" placeholder="Cari tahun (ex: 2026)..." 
-                           class="w-full pl-10 pr-10 py-2.5 bg-lightBg dark:bg-navy-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-brand text-gray-700 dark:text-gray-300 transition-all placeholder-gray-400">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
+            <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto items-center bg-gray-50 dark:bg-navy-800/50 p-2 rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm">
+                
+                <!-- Filter Tahun -->
+                <form action="{{ route('admin.periode.index') }}" method="GET" class="w-full sm:w-auto relative group">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                        <i class="fa-regular fa-calendar text-gray-400 group-hover:text-brand transition-colors"></i>
                     </div>
-                    <button type="button" x-show="search.length > 0" style="display: none;" @click="search = ''; $el.closest('form').submit()" 
-                            class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-red-500 transition">
-                        <i class="fa-solid fa-circle-xmark"></i>
-                    </button>
+                    <select name="tahun" onchange="this.form.submit()" class="w-full sm:w-40 pl-10 pr-10 py-2.5 bg-white dark:bg-navy-700 border border-transparent dark:border-white/5 rounded-xl text-sm font-semibold focus:ring-2 focus:ring-brand focus:border-brand text-gray-700 dark:text-gray-200 shadow-sm transition-all appearance-none cursor-pointer hover:shadow-md">
+                        @foreach($tahuns as $th)
+                            <option value="{{ $th }}" {{ $tahunFilter == $th ? 'selected' : '' }}>Tahun {{ $th }}</option>
+                        @endforeach
+                    </select>
+                    <div class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none">
+                        <i class="fa-solid fa-chevron-down text-xs text-gray-400"></i>
+                    </div>
                 </form>
 
-                <a href="{{ route('admin.periode.create') }}" class="bg-brand text-white text-sm font-semibold px-4 py-2.5 rounded-xl hover:bg-brandHover transition shadow-sm flex items-center justify-center whitespace-nowrap">
-                    <i class="fa-solid fa-plus mr-2"></i> Buat Periode Baru
+                <div class="hidden sm:block w-px h-8 bg-gray-200 dark:bg-white/10 mx-1"></div>
+
+                <!-- Tombol Tagihan -->
+                <a href="{{ route('admin.periode.tagihan_list', ['tahun' => $tahunFilter, 'bulan' => date('n')]) }}" class="w-full sm:w-auto bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-all shadow-sm hover:shadow-orange-500/30 flex items-center justify-center whitespace-nowrap group">
+                    <i class="fa-solid fa-list-check mr-2 group-hover:scale-110 transition-transform"></i> Tagihan Anggota
+                </a>
+
+                <!-- Tombol Buat -->
+                <a href="{{ route('admin.periode.create') }}" class="w-full sm:w-auto bg-brand text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-brandHover transition-all shadow-sm hover:shadow-brand/30 flex items-center justify-center whitespace-nowrap group">
+                    <i class="fa-solid fa-plus mr-2 group-hover:rotate-90 transition-transform"></i> Buat Baru
                 </a>
             </div>
         </div>
@@ -66,6 +81,10 @@
                                         </button>
                                     </form>
 
+                                    <a href="{{ route('admin.periode.show', $item->id) }}" class="p-2 bg-gray-50 dark:bg-gray-500/10 text-gray-500 rounded-lg hover:bg-gray-100 transition" title="Lihat Status Anggota">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </a>
+
                                     <a href="{{ route('admin.periode.edit', $item->id) }}" class="p-2 bg-blue-50 dark:bg-blue-500/10 text-blue-500 rounded-lg hover:bg-blue-100 transition" title="Edit">
                                         <i class="fa-solid fa-pen-to-square"></i>
                                     </a>
@@ -102,7 +121,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="py-10 text-center text-gray-400">Belum ada periode kas yang dibuat.</td>
+                            <td colspan="4" class="py-10 text-center text-gray-400">Belum ada pembayaran kas yang dibuat.</td>
                         </tr>
                     @endforelse
                 </tbody>

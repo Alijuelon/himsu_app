@@ -95,30 +95,46 @@
                     </button>
 
                     <div x-data="{ profileOpen: false }" class="relative ml-2">
-                        <button @click="profileOpen = !profileOpen" class="focus:outline-none">
-                            <img class="object-cover w-10 h-10 rounded-full border-2 border-white dark:border-navy-700 shadow-sm cursor-pointer" 
+                        <button @click="profileOpen = !profileOpen" class="flex items-center gap-2 focus:outline-none p-1 rounded-full hover:bg-gray-100 dark:hover:bg-navy-700 transition-all">
+                            <img class="object-cover w-9 h-9 rounded-full shadow-sm" 
                                  src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->nama_lengkap ?? Auth::user()->name) }}&background=4318FF&color=fff&bold=true" 
                                  alt="Profile">
+                            <i class="fa-solid fa-chevron-down text-xs text-gray-400 dark:text-gray-500 mr-1 transition-transform duration-300" :class="profileOpen ? 'rotate-180' : ''"></i>
                         </button>
                         
-                        <div x-show="profileOpen" @click.away="profileOpen = false" x-transition 
-                             class="absolute right-0 mt-2 w-48 bg-white dark:bg-navy-700 rounded-xl shadow-lg py-2 border border-gray-100 dark:border-white/5 z-50">
+                        <div x-show="profileOpen" @click.away="profileOpen = false" 
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 scale-95 translate-y-2"
+                             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                             x-transition:leave="transition ease-in duration-150"
+                             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                             x-transition:leave-end="opacity-0 scale-95 translate-y-2"
+                             style="display: none;"
+                             class="absolute right-0 mt-3 w-56 bg-white/80 dark:bg-navy-800/80 backdrop-blur-xl rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/20 dark:border-white/10 z-50 overflow-hidden">
                             
-                            <div class="px-4 py-2 border-b border-gray-100 dark:border-white/5 mb-1">
-                                <p class="text-sm font-bold text-darkText dark:text-white">{{ Auth::user()->nama_lengkap ?? Auth::user()->name }}</p>
-                                <p class="text-xs text-gray-400">{{ Auth::user()->email ?? Auth::user()->username }}</p>
+                            <div class="px-5 py-4 bg-gradient-to-br from-lightBg to-white dark:from-navy-700 dark:to-navy-800 border-b border-gray-100 dark:border-white/5">
+                                <p class="text-sm font-bold text-darkText dark:text-white truncate">{{ Auth::user()->nama_lengkap ?? Auth::user()->name }}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">{{ Auth::user()->email ?? Auth::user()->username }}</p>
                             </div>
 
-                            <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-lightBg dark:hover:bg-white/5 transition">
-                                <i class="fa-regular fa-user w-5"></i> Profile
-                            </a>
-                            
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition">
-                                    <i class="fa-solid fa-right-from-bracket w-5"></i> Log Out
-                                </button>
-                            </form>
+                            <div class="p-2 flex flex-col gap-1">
+                                <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl transition-all">
+                                    <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 dark:bg-navy-700 text-gray-500 dark:text-gray-400">
+                                        <i class="fa-regular fa-user"></i>
+                                    </div>
+                                    Profile Saya
+                                </a>
+                                
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="flex items-center gap-3 w-full text-left px-3 py-2 text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-all">
+                                        <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-red-50 dark:bg-red-500/10 text-red-500">
+                                            <i class="fa-solid fa-power-off"></i>
+                                        </div>
+                                        Keluar
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>

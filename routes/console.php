@@ -8,4 +8,4 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote')->hourly();
 
-Schedule::command('wa:send-tagihan')->dailyAt('09:00');
+Schedule::command('wa:send-tagihan')->everyMinute();

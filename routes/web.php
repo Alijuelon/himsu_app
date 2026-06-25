@@ -44,6 +44,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::put('verifikasi-akun/{id}', [VerifikasiAkunController::class, 'verify'])->name('verifikasi.update');
     
     // Kelola Master Periode Kas (TAMBAHKAN INI)
+    Route::get('periode/tagihan-list', [PeriodeKasController::class, 'tagihanList'])->name('periode.tagihan_list');
     Route::resource('periode', PeriodeKasController::class);
     Route::post('periode/{id}/tagihan', [PeriodeKasController::class, 'sendTagihan'])->name('periode.tagihan');
     
@@ -70,6 +71,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::prefix('wa-notification')->name('wa.')->group(function () {
         Route::get('settings', [WaNotificationController::class, 'settings'])->name('settings');
         Route::post('settings', [WaNotificationController::class, 'updateSettings'])->name('settings.update');
+        Route::post('settings/schedule', [WaNotificationController::class, 'updateSchedule'])->name('settings.schedule');
+        Route::post('settings/broadcast', [WaNotificationController::class, 'broadcastTagihanManual'])->name('settings.broadcast');
         Route::get('members', [WaNotificationController::class, 'members'])->name('members');
         Route::put('members/{id}', [WaNotificationController::class, 'updateMemberWa'])->name('members.update');
     });

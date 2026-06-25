@@ -20,17 +20,23 @@ class BayarKasController extends Controller
             ->whereIn('status', ['pending', 'diterima'])
             ->pluck('periode_id');
 
-        // Ambil data periode kas yang statusnya masih 'aktif'
-        $periodeAktif = PeriodeKas::where('status', 'aktif')
-            ->whereNotIn('id', $periodeSudahDibayar)
-            ->orderBy('tahun', 'desc')->orderBy('bulan', 'desc')
+        // Ambil semua periode yang belum dibayar
+        $semuaPeriode = PeriodeKas::whereNotIn('id', $periodeSudahDibayar)
+            ->orderBy('tahun', 'asc')->orderBy('bulan', 'asc')
             ->get();
             
-        // Ambil tagihan terlewat (periode tutup yang belum dibayar)
-        $tagihanTerlewat = PeriodeKas::where('status', 'tutup')
-            ->whereNotIn('id', $periodeSudahDibayar)
-            ->orderBy('tahun', 'desc')->orderBy('bulan', 'desc')
-            ->get();
+        $bulanIni = (int) date('n');
+        $tahunIni = (int) date('Y');
+
+        // Pisahkan tagihan terlewat (bulan-bulan sebelumnya)
+        $tagihanTerlewat = $semuaPeriode->filter(function($p) use ($bulanIni, $tahunIni) {
+            return ($p->tahun < $tahunIni) || ($p->tahun == $tahunIni && $p->bulan < $bulanIni);
+        });
+
+        // Pisahkan tagihan saat ini dan mendatang
+        $tagihanMendatang = $semuaPeriode->filter(function($p) use ($bulanIni, $tahunIni) {
+            return ($p->tahun > $tahunIni) || ($p->tahun == $tahunIni && $p->bulan >= $bulanIni);
+        });
             
         $namaBulan = [
             1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 
@@ -38,7 +44,7 @@ class BayarKasController extends Controller
             9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
         ];
 
-        return view('anggota.bayar.create', compact('periodeAktif', 'tagihanTerlewat', 'namaBulan'));
+        return view('anggota.bayar.create', compact('tagihanTerlewat', 'tagihanMendatang', 'namaBulan', 'bulanIni', 'tahunIni'));
     }
 
     // Memproses Data Pembayaran & Upload Bukti Transfer

@@ -87,9 +87,15 @@ class PembayaranKasController extends Controller
                 if ($waSetting && $waSetting->is_active && $pembayaran->anggota && $pembayaran->anggota->no_hp) {
                     $template = $request->status === 'diterima' ? $waSetting->template_pembayaran_diterima : $waSetting->template_pembayaran_ditolak;
                     if (!empty($template)) {
+                        $namaBulanArr = [
+                            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 
+                            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus', 
+                            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+                        ];
+                        
                         $message = WhatsAppService::buildMessage($template, [
                             'nama' => $pembayaran->anggota->nama_lengkap,
-                            'bulan' => $pembayaran->periode->bulan,
+                            'bulan' => $namaBulanArr[$pembayaran->periode->bulan] ?? $pembayaran->periode->bulan,
                             'tahun' => $pembayaran->periode->tahun,
                             'nominal' => number_format($pembayaran->jumlah_bayar, 0, ',', '.'),
                             'status' => strtoupper($request->status),

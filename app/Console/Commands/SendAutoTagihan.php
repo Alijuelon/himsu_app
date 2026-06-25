@@ -11,7 +11,7 @@ class SendAutoTagihan extends Command
      *
      * @var string
      */
-    protected $signature = 'wa:send-tagihan';
+    protected $signature = 'wa:send-tagihan {--force}';
 
     /**
      * The console command description.
@@ -28,21 +28,38 @@ class SendAutoTagihan extends Command
         $waSetting = \App\Models\WaSetting::first();
 
         // Cek apakah fitur aktif dan tanggal otomatis di-set
-        if (!$waSetting || !$waSetting->is_active || empty($waSetting->fonnte_token) || empty($waSetting->template_tagihan) || empty($waSetting->tgl_tagihan_otomatis)) {
-            $this->info('Layanan WA belum aktif, token kosong, atau tanggal otomatis belum diatur.');
+        if (!$waSetting || !$waSetting->is_active || empty($waSetting->fonnte_token) || empty($waSetting->template_tagihan)) {
+            $this->info('Layanan WA belum aktif atau token kosong.');
             return;
         }
 
-        // Cek apakah hari ini sama dengan tanggal tagihan otomatis
-        $hariIni = (int) date('d');
-        if ($hariIni !== (int) $waSetting->tgl_tagihan_otomatis) {
-            $this->info("Hari ini tanggal {$hariIni}, bukan jadwal kirim otomatis (Tanggal {$waSetting->tgl_tagihan_otomatis}).");
-            return;
+        $force = $this->option('force');
+
+        if (!$force) {
+            if (empty($waSetting->tgl_tagihan_otomatis) || empty($waSetting->waktu_tagihan_otomatis)) {
+                $this->info('Tanggal atau waktu otomatis belum diatur.');
+                return;
+            }
+
+            // Cek apakah hari ini sama dengan tanggal tagihan otomatis
+            $hariIni = (int) now()->format('d');
+            if ($hariIni !== (int) $waSetting->tgl_tagihan_otomatis) {
+                $this->info("Hari ini tanggal {$hariIni}, bukan jadwal kirim otomatis (Tanggal {$waSetting->tgl_tagihan_otomatis}).");
+                return;
+            }
+
+            // Cek apakah waktu saat ini sama dengan waktu tagihan otomatis
+            $waktuIni = now()->format('H:i');
+            $waktuSet = substr($waSetting->waktu_tagihan_otomatis, 0, 5);
+            if ($waktuIni !== $waktuSet) {
+                $this->info("Waktu saat ini {$waktuIni}, bukan jadwal kirim otomatis (Waktu {$waktuSet}).");
+                return;
+            }
         }
 
         // Ambil periode kas yang aktif di bulan dan tahun saat ini
-        $bulanIni = (int) date('n');
-        $tahunIni = (int) date('Y');
+        $bulanIni = (int) now()->format('n');
+        $tahunIni = (int) now()->format('Y');
 
         $periode = \App\Models\PeriodeKas::where('bulan', $bulanIni)
             ->where('tahun', $tahunIni)

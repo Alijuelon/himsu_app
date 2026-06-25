@@ -13,5 +13,6 @@ class WaSetting extends Model
         'template_pembayaran_ditolak',
         'is_active',
         'tgl_tagihan_otomatis',
+        'waktu_tagihan_otomatis',
     ];
 }

@@ -28,85 +28,131 @@
             <span class="mx-3">Dashboard Admin</span>
         </x-nav-link>
 
-        <x-nav-link :href="route('admin.anggota.index')" :active="request()->routeIs('admin.anggota.*')" class="flex items-center px-4 py-3 {{ request()->routeIs('admin.anggota.*') ? 'bg-lightBg dark:bg-white/5 text-brand dark:text-brand font-semibold' : 'text-gray-500 dark:text-gray-400 font-medium hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }} rounded-xl transition-colors relative w-full border-none">
-            @if(request()->routeIs('admin.anggota.*'))
-                <div class="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-1 bg-brand rounded-l-full"></div>
-            @endif
-            <i class="fa-solid fa-users w-5 text-center text-lg"></i>
-            <span class="mx-3">Data Anggota</span>
-        </x-nav-link>
+        <!-- Dropdown Kelola Data -->
+        @php $isMasterActive = request()->routeIs('admin.anggota.*', 'admin.verifikasi.*', 'admin.periode.*'); @endphp
+        <div x-data="{ open: {{ $isMasterActive ? 'true' : 'false' }} }" class="space-y-1">
+            <button @click="open = !open" class="flex items-center justify-between px-4 py-3 w-full rounded-xl transition-colors font-medium border-none {{ $isMasterActive ? 'bg-lightBg dark:bg-white/5 text-brand dark:text-brand font-semibold' : 'text-gray-500 dark:text-gray-400 hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }}">
+                <div class="flex items-center relative">
+                    @if($isMasterActive)
+                        <div class="absolute -left-4 top-1/2 -translate-y-1/2 h-8 w-1 bg-brand rounded-r-full"></div>
+                    @endif
+                    <i class="fa-solid fa-database w-5 text-center text-lg"></i>
+                    <span class="mx-3">Kelola Data</span>
+                </div>
+                <i class="fa-solid fa-chevron-down text-xs transition-transform duration-300" :class="open ? 'rotate-180' : ''"></i>
+            </button>
+            <div x-show="open" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-2" style="display: none;" class="pl-11 pr-4 py-1 space-y-1 relative">
+                <div class="absolute left-[1.35rem] top-0 bottom-2 w-px bg-gray-200 dark:bg-white/10"></div>
+                
+                <a href="{{ route('admin.anggota.index') }}" class="relative flex items-center px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('admin.anggota.*') ? 'text-brand dark:text-brand font-semibold bg-gray-50 dark:bg-white/5' : 'text-gray-500 dark:text-gray-400 hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }}">
+                    @if(request()->routeIs('admin.anggota.*')) <div class="absolute -left-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-brand"></div> @endif
+                    <i class="fa-solid fa-users w-5 text-center mr-2"></i>
+                    Data Anggota
+                </a>
+                <a href="{{ route('admin.verifikasi.index') }}" class="relative flex items-center px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('admin.verifikasi.*') ? 'text-brand dark:text-brand font-semibold bg-gray-50 dark:bg-white/5' : 'text-gray-500 dark:text-gray-400 hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }}">
+                    @if(request()->routeIs('admin.verifikasi.*')) <div class="absolute -left-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-brand"></div> @endif
+                    <i class="fa-solid fa-user-check w-5 text-center mr-2"></i>
+                    Verifikasi Akun
+                </a>
+                <a href="{{ route('admin.periode.index') }}" class="relative flex items-center px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('admin.periode.*') ? 'text-brand dark:text-brand font-semibold bg-gray-50 dark:bg-white/5' : 'text-gray-500 dark:text-gray-400 hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }}">
+                    @if(request()->routeIs('admin.periode.*')) <div class="absolute -left-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-brand"></div> @endif
+                    <i class="fa-solid fa-calendar-days w-5 text-center mr-2"></i>
+                    Pembayaran Kas
+                </a>
+            </div>
+        </div>
 
-        <x-nav-link :href="route('admin.verifikasi.index')" :active="request()->routeIs('admin.verifikasi.*')" class="flex items-center px-4 py-3 {{ request()->routeIs('admin.verifikasi.*') ? 'bg-lightBg dark:bg-white/5 text-brand dark:text-brand font-semibold' : 'text-gray-500 dark:text-gray-400 font-medium hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }} rounded-xl transition-colors relative w-full border-none">
-            @if(request()->routeIs('admin.verifikasi.*'))
-                <div class="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-1 bg-brand rounded-l-full"></div>
-            @endif
-            <i class="fa-solid fa-user-check w-5 text-center text-lg"></i>
-            <span class="mx-3">Verifikasi Akun</span>
-        </x-nav-link>
-        <x-nav-link :href="route('admin.periode.index')" :active="request()->routeIs('admin.periode.*')" class="flex items-center px-4 py-3 {{ request()->routeIs('admin.periode.*') ? 'bg-lightBg dark:bg-white/5 text-brand dark:text-brand font-semibold' : 'text-gray-500 dark:text-gray-400 font-medium hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }} rounded-xl transition-colors relative w-full border-none">
-            @if(request()->routeIs('admin.periode.*'))
-                <div class="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-1 bg-brand rounded-l-full"></div>
-            @endif
-            <i class="fa-solid fa-calendar-days w-5 text-center text-lg"></i>
-            <span class="mx-3">Periode Tagihan</span>
-        </x-nav-link>
-        <x-nav-link :href="route('admin.pembayaran.index')" :active="request()->routeIs('admin.pembayaran.*')" class="flex items-center px-4 py-3 {{ request()->routeIs('admin.pembayaran.*') ? 'bg-lightBg dark:bg-white/5 text-brand dark:text-brand font-semibold' : 'text-gray-500 dark:text-gray-400 font-medium hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }} rounded-xl transition-colors relative w-full border-none">
-            @if(request()->routeIs('admin.pembayaran.*'))
-                <div class="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-1 bg-brand rounded-l-full"></div>
-            @endif
-            <i class="fa-solid fa-file-invoice-dollar w-5 text-center text-lg"></i>
-            <span class="mx-3">Pembayaran Kas</span>
-        </x-nav-link>
+        <!-- Dropdown Transaksi Kas -->
+        @php $isTransaksiActive = request()->routeIs('admin.pembayaran.*', 'admin.bukukas.pemasukan', 'admin.bukukas.pengeluaran'); @endphp
+        <div x-data="{ open: {{ $isTransaksiActive ? 'true' : 'false' }} }" class="space-y-1">
+            <button @click="open = !open" class="flex items-center justify-between px-4 py-3 w-full rounded-xl transition-colors font-medium border-none {{ $isTransaksiActive ? 'bg-lightBg dark:bg-white/5 text-brand dark:text-brand font-semibold' : 'text-gray-500 dark:text-gray-400 hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }}">
+                <div class="flex items-center relative">
+                    @if($isTransaksiActive)
+                        <div class="absolute -left-4 top-1/2 -translate-y-1/2 h-8 w-1 bg-brand rounded-r-full"></div>
+                    @endif
+                    <i class="fa-solid fa-wallet w-5 text-center text-lg"></i>
+                    <span class="mx-3">Transaksi Kas</span>
+                </div>
+                <i class="fa-solid fa-chevron-down text-xs transition-transform duration-300" :class="open ? 'rotate-180' : ''"></i>
+            </button>
+            <div x-show="open" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-2" style="display: none;" class="pl-11 pr-4 py-1 space-y-1 relative">
+                <div class="absolute left-[1.35rem] top-0 bottom-2 w-px bg-gray-200 dark:bg-white/10"></div>
+                
+                <a href="{{ route('admin.pembayaran.index') }}" class="relative flex items-center px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('admin.pembayaran.*') ? 'text-brand dark:text-brand font-semibold bg-gray-50 dark:bg-white/5' : 'text-gray-500 dark:text-gray-400 hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }}">
+                    @if(request()->routeIs('admin.pembayaran.*')) <div class="absolute -left-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-brand"></div> @endif
+                    <i class="fa-solid fa-file-invoice-dollar w-5 text-center mr-2"></i>
+                    Pembayaran Kas
+                </a>
+                <a href="{{ route('admin.bukukas.pemasukan') }}" class="relative flex items-center px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('admin.bukukas.pemasukan') ? 'text-brand dark:text-brand font-semibold bg-gray-50 dark:bg-white/5' : 'text-gray-500 dark:text-gray-400 hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }}">
+                    @if(request()->routeIs('admin.bukukas.pemasukan')) <div class="absolute -left-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-brand"></div> @endif
+                    <i class="fa-solid fa-arrow-trend-up w-5 text-center mr-2"></i>
+                    Pemasukan Kas
+                </a>
+                <a href="{{ route('admin.bukukas.pengeluaran') }}" class="relative flex items-center px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('admin.bukukas.pengeluaran') ? 'text-brand dark:text-brand font-semibold bg-gray-50 dark:bg-white/5' : 'text-gray-500 dark:text-gray-400 hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }}">
+                    @if(request()->routeIs('admin.bukukas.pengeluaran')) <div class="absolute -left-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-brand"></div> @endif
+                    <i class="fa-solid fa-arrow-trend-down w-5 text-center mr-2"></i>
+                    Pengeluaran Kas
+                </a>
+            </div>
+        </div>
 
-        <x-nav-link :href="route('admin.bukukas.pemasukan')" :active="request()->routeIs('admin.bukukas.pemasukan')" class="flex items-center px-4 py-3 {{ request()->routeIs('admin.bukukas.pemasukan') ? 'bg-lightBg dark:bg-white/5 text-brand dark:text-brand font-semibold' : 'text-gray-500 dark:text-gray-400 font-medium hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }} rounded-xl transition-colors relative w-full border-none">
-            @if(request()->routeIs('admin.bukukas.pemasukan'))
-                <div class="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-1 bg-brand rounded-l-full"></div>
-            @endif
-            <i class="fa-solid fa-arrow-trend-up w-5 text-center text-lg"></i>
-            <span class="mx-3">Pemasukan Kas</span>
-        </x-nav-link>
+        <!-- Dropdown Laporan -->
+        @php $isLaporanActive = request()->routeIs('admin.laporan.*'); @endphp
+        <div x-data="{ open: {{ $isLaporanActive ? 'true' : 'false' }} }" class="space-y-1">
+            <button @click="open = !open" class="flex items-center justify-between px-4 py-3 w-full rounded-xl transition-colors font-medium border-none {{ $isLaporanActive ? 'bg-lightBg dark:bg-white/5 text-brand dark:text-brand font-semibold' : 'text-gray-500 dark:text-gray-400 hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }}">
+                <div class="flex items-center relative">
+                    @if($isLaporanActive)
+                        <div class="absolute -left-4 top-1/2 -translate-y-1/2 h-8 w-1 bg-brand rounded-r-full"></div>
+                    @endif
+                    <i class="fa-solid fa-chart-pie w-5 text-center text-lg"></i>
+                    <span class="mx-3">Laporan</span>
+                </div>
+                <i class="fa-solid fa-chevron-down text-xs transition-transform duration-300" :class="open ? 'rotate-180' : ''"></i>
+            </button>
+            <div x-show="open" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-2" style="display: none;" class="pl-11 pr-4 py-1 space-y-1 relative">
+                <div class="absolute left-[1.35rem] top-0 bottom-2 w-px bg-gray-200 dark:bg-white/10"></div>
+                
+                <a href="{{ route('admin.laporan.index') }}" class="relative flex items-center px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('admin.laporan.index') || request()->routeIs('admin.laporan.pdf') ? 'text-brand dark:text-brand font-semibold bg-gray-50 dark:bg-white/5' : 'text-gray-500 dark:text-gray-400 hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }}">
+                    @if(request()->routeIs('admin.laporan.index') || request()->routeIs('admin.laporan.pdf')) <div class="absolute -left-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-brand"></div> @endif
+                    <i class="fa-solid fa-chart-pie w-5 text-center mr-2"></i>
+                    Laporan Keuangan
+                </a>
+                <a href="{{ route('admin.laporan.laba-rugi') }}" class="relative flex items-center px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('admin.laporan.laba-rugi') ? 'text-brand dark:text-brand font-semibold bg-gray-50 dark:bg-white/5' : 'text-gray-500 dark:text-gray-400 hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }}">
+                    @if(request()->routeIs('admin.laporan.laba-rugi')) <div class="absolute -left-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-brand"></div> @endif
+                    <i class="fa-solid fa-scale-balanced w-5 text-center mr-2"></i>
+                    Laba Rugi
+                </a>
+            </div>
+        </div>
 
-        <x-nav-link :href="route('admin.bukukas.pengeluaran')" :active="request()->routeIs('admin.bukukas.pengeluaran')" class="flex items-center px-4 py-3 {{ request()->routeIs('admin.bukukas.pengeluaran') ? 'bg-lightBg dark:bg-white/5 text-brand dark:text-brand font-semibold' : 'text-gray-500 dark:text-gray-400 font-medium hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }} rounded-xl transition-colors relative w-full border-none">
-            @if(request()->routeIs('admin.bukukas.pengeluaran'))
-                <div class="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-1 bg-brand rounded-l-full"></div>
-            @endif
-            <i class="fa-solid fa-arrow-trend-down w-5 text-center text-lg"></i>
-            <span class="mx-3">Pengeluaran Kas</span>
-        </x-nav-link>
-
-        <x-nav-link :href="route('admin.laporan.index')" :active="request()->routeIs('admin.laporan.index') || request()->routeIs('admin.laporan.pdf')" class="flex items-center px-4 py-3 {{ request()->routeIs('admin.laporan.index') || request()->routeIs('admin.laporan.pdf') ? 'bg-lightBg dark:bg-white/5 text-brand dark:text-brand font-semibold' : 'text-gray-500 dark:text-gray-400 font-medium hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }} rounded-xl transition-colors relative w-full border-none">
-            @if(request()->routeIs('admin.laporan.index') || request()->routeIs('admin.laporan.pdf'))
-                <div class="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-1 bg-brand rounded-l-full"></div>
-            @endif
-            <i class="fa-solid fa-chart-pie w-5 text-center text-lg"></i>
-            <span class="mx-3">Laporan Keuangan</span>
-        </x-nav-link>
-
-        <x-nav-link :href="route('admin.laporan.laba-rugi')" :active="request()->routeIs('admin.laporan.laba-rugi')" class="flex items-center px-4 py-3 {{ request()->routeIs('admin.laporan.laba-rugi') ? 'bg-lightBg dark:bg-white/5 text-brand dark:text-brand font-semibold' : 'text-gray-500 dark:text-gray-400 font-medium hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }} rounded-xl transition-colors relative w-full border-none">
-            @if(request()->routeIs('admin.laporan.laba-rugi'))
-                <div class="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-1 bg-brand rounded-l-full"></div>
-            @endif
-            <i class="fa-solid fa-scale-balanced w-5 text-center text-lg"></i>
-            <span class="mx-3">Laba Rugi</span>
-        </x-nav-link>
-
-        <p class="px-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3 mt-4">WhatsApp Gateway</p>
-
-        <x-nav-link :href="route('admin.wa.settings')" :active="request()->routeIs('admin.wa.settings')" class="flex items-center px-4 py-3 {{ request()->routeIs('admin.wa.settings') ? 'bg-lightBg dark:bg-white/5 text-brand dark:text-brand font-semibold' : 'text-gray-500 dark:text-gray-400 font-medium hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }} rounded-xl transition-colors relative w-full border-none">
-            @if(request()->routeIs('admin.wa.settings'))
-                <div class="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-1 bg-brand rounded-l-full"></div>
-            @endif
-            <i class="fa-brands fa-whatsapp w-5 text-center text-lg"></i>
-            <span class="mx-3">Pengaturan WA</span>
-        </x-nav-link>
-
-        <x-nav-link :href="route('admin.wa.members')" :active="request()->routeIs('admin.wa.members')" class="flex items-center px-4 py-3 {{ request()->routeIs('admin.wa.members') ? 'bg-lightBg dark:bg-white/5 text-brand dark:text-brand font-semibold' : 'text-gray-500 dark:text-gray-400 font-medium hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }} rounded-xl transition-colors relative w-full border-none">
-            @if(request()->routeIs('admin.wa.members'))
-                <div class="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-1 bg-brand rounded-l-full"></div>
-            @endif
-            <i class="fa-solid fa-mobile-screen w-5 text-center text-lg"></i>
-            <span class="mx-3">Nomor WA Anggota</span>
-        </x-nav-link>
+        <!-- Dropdown WA Gateway -->
+        @php $isWaActive = request()->routeIs('admin.wa.*'); @endphp
+        <div x-data="{ open: {{ $isWaActive ? 'true' : 'false' }} }" class="space-y-1 mt-2">
+            <button @click="open = !open" class="flex items-center justify-between px-4 py-3 w-full rounded-xl transition-colors font-medium border-none {{ $isWaActive ? 'bg-lightBg dark:bg-white/5 text-brand dark:text-brand font-semibold' : 'text-gray-500 dark:text-gray-400 hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }}">
+                <div class="flex items-center relative">
+                    @if($isWaActive)
+                        <div class="absolute -left-4 top-1/2 -translate-y-1/2 h-8 w-1 bg-brand rounded-r-full"></div>
+                    @endif
+                    <i class="fa-brands fa-whatsapp w-5 text-center text-lg"></i>
+                    <span class="mx-3">WA Gateway</span>
+                </div>
+                <i class="fa-solid fa-chevron-down text-xs transition-transform duration-300" :class="open ? 'rotate-180' : ''"></i>
+            </button>
+            <div x-show="open" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-2" style="display: none;" class="pl-11 pr-4 py-1 space-y-1 relative">
+                <div class="absolute left-[1.35rem] top-0 bottom-2 w-px bg-gray-200 dark:bg-white/10"></div>
+                
+                <a href="{{ route('admin.wa.settings') }}" class="relative flex items-center px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('admin.wa.settings') ? 'text-brand dark:text-brand font-semibold bg-gray-50 dark:bg-white/5' : 'text-gray-500 dark:text-gray-400 hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }}">
+                    @if(request()->routeIs('admin.wa.settings')) <div class="absolute -left-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-brand"></div> @endif
+                    <i class="fa-brands fa-whatsapp w-5 text-center mr-2"></i>
+                    Pengaturan WA
+                </a>
+                <a href="{{ route('admin.wa.members') }}" class="relative flex items-center px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('admin.wa.members') ? 'text-brand dark:text-brand font-semibold bg-gray-50 dark:bg-white/5' : 'text-gray-500 dark:text-gray-400 hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }}">
+                    @if(request()->routeIs('admin.wa.members')) <div class="absolute -left-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-brand"></div> @endif
+                    <i class="fa-solid fa-mobile-screen w-5 text-center mr-2"></i>
+                    Nomor WA Anggota
+                </a>
+            </div>
+        </div>
 
     @else
         <p class="px-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">Menu Anggota</p>
@@ -119,29 +165,39 @@
             <span class="mx-3">Dashboard Anggota</span>
         </x-nav-link>
 
-        <x-nav-link :href="route('anggota.bayar.create')" :active="request()->routeIs('anggota.bayar.*')" class="flex items-center px-4 py-3 {{ request()->routeIs('anggota.bayar.*') ? 'bg-lightBg dark:bg-white/5 text-brand dark:text-brand font-semibold' : 'text-gray-500 dark:text-gray-400 font-medium hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }} rounded-xl transition-colors relative w-full border-none">
-            @if(request()->routeIs('anggota.bayar.*'))
-                <div class="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-1 bg-brand rounded-l-full"></div>
-            @endif
-            <i class="fa-solid fa-money-bill-transfer w-5 text-center text-lg"></i>
-            <span class="mx-3">Bayar Kas</span>
-        </x-nav-link>
-
-        <x-nav-link :href="route('anggota.riwayat.index')" :active="request()->routeIs('anggota.riwayat.*')" class="flex items-center px-4 py-3 {{ request()->routeIs('anggota.riwayat.*') ? 'bg-lightBg dark:bg-white/5 text-brand dark:text-brand font-semibold' : 'text-gray-500 dark:text-gray-400 font-medium hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }} rounded-xl transition-colors relative w-full border-none">
-            @if(request()->routeIs('anggota.riwayat.*'))
-                <div class="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-1 bg-brand rounded-l-full"></div>
-            @endif
-            <i class="fa-solid fa-clock-rotate-left w-5 text-center text-lg"></i>
-            <span class="mx-3">Riwayat Pembayaran</span>
-        </x-nav-link>
-        
-        <x-nav-link :href="route('anggota.saldo.index')" :active="request()->routeIs('anggota.saldo.*')" class="flex items-center px-4 py-3 {{ request()->routeIs('anggota.saldo.*') ? 'bg-lightBg dark:bg-white/5 text-brand dark:text-brand font-semibold' : 'text-gray-500 dark:text-gray-400 font-medium hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }} rounded-xl transition-colors relative w-full border-none">
-            @if(request()->routeIs('anggota.saldo.*'))
-                <div class="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-1 bg-brand rounded-l-full"></div>
-            @endif
-            <i class="fa-solid fa-wallet w-5 text-center text-lg"></i>
-            <span class="mx-3">Info Saldo Kas</span>
-        </x-nav-link>
+        <!-- Dropdown Keuangan Anggota -->
+        @php $isKeuanganActive = request()->routeIs('anggota.bayar.*', 'anggota.riwayat.*', 'anggota.saldo.*'); @endphp
+        <div x-data="{ open: {{ $isKeuanganActive ? 'true' : 'false' }} }" class="space-y-1">
+            <button @click="open = !open" class="flex items-center justify-between px-4 py-3 w-full rounded-xl transition-colors font-medium border-none {{ $isKeuanganActive ? 'bg-lightBg dark:bg-white/5 text-brand dark:text-brand font-semibold' : 'text-gray-500 dark:text-gray-400 hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }}">
+                <div class="flex items-center relative">
+                    @if($isKeuanganActive)
+                        <div class="absolute -left-4 top-1/2 -translate-y-1/2 h-8 w-1 bg-brand rounded-r-full"></div>
+                    @endif
+                    <i class="fa-solid fa-wallet w-5 text-center text-lg"></i>
+                    <span class="mx-3">Keuangan Kas</span>
+                </div>
+                <i class="fa-solid fa-chevron-down text-xs transition-transform duration-300" :class="open ? 'rotate-180' : ''"></i>
+            </button>
+            <div x-show="open" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-2" style="display: none;" class="pl-11 pr-4 py-1 space-y-1 relative">
+                <div class="absolute left-[1.35rem] top-0 bottom-2 w-px bg-gray-200 dark:bg-white/10"></div>
+                
+                <a href="{{ route('anggota.bayar.create') }}" class="relative flex items-center px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('anggota.bayar.*') ? 'text-brand dark:text-brand font-semibold bg-gray-50 dark:bg-white/5' : 'text-gray-500 dark:text-gray-400 hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }}">
+                    @if(request()->routeIs('anggota.bayar.*')) <div class="absolute -left-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-brand"></div> @endif
+                    <i class="fa-solid fa-money-bill-transfer w-5 text-center mr-2"></i>
+                    Bayar Kas
+                </a>
+                <a href="{{ route('anggota.riwayat.index') }}" class="relative flex items-center px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('anggota.riwayat.*') ? 'text-brand dark:text-brand font-semibold bg-gray-50 dark:bg-white/5' : 'text-gray-500 dark:text-gray-400 hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }}">
+                    @if(request()->routeIs('anggota.riwayat.*')) <div class="absolute -left-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-brand"></div> @endif
+                    <i class="fa-solid fa-clock-rotate-left w-5 text-center mr-2"></i>
+                    Riwayat Pembayaran
+                </a>
+                <a href="{{ route('anggota.saldo.index') }}" class="relative flex items-center px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('anggota.saldo.*') ? 'text-brand dark:text-brand font-semibold bg-gray-50 dark:bg-white/5' : 'text-gray-500 dark:text-gray-400 hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }}">
+                    @if(request()->routeIs('anggota.saldo.*')) <div class="absolute -left-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-brand"></div> @endif
+                    <i class="fa-solid fa-wallet w-5 text-center mr-2"></i>
+                    Info Saldo Kas
+                </a>
+            </div>
+        </div>
         
         <div class="mt-8 mx-2 p-5 bg-gradient-to-br from-brand to-[#868CFF] rounded-xl text-white text-center shadow-lg shadow-brand/30 dark:shadow-none border border-white/10">
             <div class="bg-white/20 p-2 rounded-full inline-block mb-2">

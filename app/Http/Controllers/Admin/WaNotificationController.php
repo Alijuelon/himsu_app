@@ -21,6 +21,7 @@ class WaNotificationController extends Controller
         $request->validate([
             'fonnte_token' => 'nullable|string',
             'tgl_tagihan_otomatis' => 'nullable|integer|between:1,28',
+            'waktu_tagihan_otomatis' => 'nullable|date_format:H:i',
             'template_tagihan' => 'nullable|string',
             'template_pembayaran_diterima' => 'nullable|string',
             'template_pembayaran_ditolak' => 'nullable|string',
@@ -29,6 +30,7 @@ class WaNotificationController extends Controller
         $setting = WaSetting::first() ?? new WaSetting;
         $setting->fonnte_token = $request->fonnte_token;
         $setting->tgl_tagihan_otomatis = $request->tgl_tagihan_otomatis;
+        $setting->waktu_tagihan_otomatis = $request->waktu_tagihan_otomatis;
         $setting->template_tagihan = $request->template_tagihan;
         $setting->template_pembayaran_diterima = $request->template_pembayaran_diterima;
         $setting->template_pembayaran_ditolak = $request->template_pembayaran_ditolak;
@@ -36,6 +38,27 @@ class WaNotificationController extends Controller
         $setting->save();
 
         return redirect()->back()->with('success', 'Pengaturan Notifikasi WA berhasil disimpan.');
+    }
+
+    public function updateSchedule(Request $request)
+    {
+        $request->validate([
+            'tgl_tagihan_otomatis' => 'nullable|integer|between:1,28',
+            'waktu_tagihan_otomatis' => 'nullable|date_format:H:i',
+        ]);
+
+        $setting = WaSetting::first() ?? new WaSetting;
+        $setting->tgl_tagihan_otomatis = $request->tgl_tagihan_otomatis;
+        $setting->waktu_tagihan_otomatis = $request->waktu_tagihan_otomatis;
+        $setting->save();
+
+        return redirect()->back()->with('success', 'Jadwal pengiriman WA otomatis berhasil disimpan.');
+    }
+
+    public function broadcastTagihanManual()
+    {
+        \Illuminate\Support\Facades\Artisan::call('wa:send-tagihan', ['--force' => true]);
+        return redirect()->back()->with('success', 'Broadcast tagihan berhasil dikirim ke seluruh anggota yang belum lunas.');
     }
 
     public function members(Request $request)

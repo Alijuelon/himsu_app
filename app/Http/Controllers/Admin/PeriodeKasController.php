@@ -16,13 +16,26 @@ class PeriodeKasController extends Controller
     {
         $query = PeriodeKas::query();
 
+        // Ambil tahun dari request atau gunakan tahun saat ini
+        $tahunFilter = $request->input('tahun', date('Y'));
+        
+        $query->where('tahun', $tahunFilter);
+
         if ($request->has('search') && $request->search != '') {
-            $query->where('tahun', 'like', '%' . $request->search . '%')
-                  ->orWhere('bulan', 'like', '%' . $request->search . '%');
+            $query->where(function($q) use ($request) {
+                $q->where('bulan', 'like', '%' . $request->search . '%');
+            });
         }
 
-        $periode = $query->orderBy('tahun', 'desc')->orderBy('bulan', 'desc')->paginate(10)->withQueryString();
+        // Tampilkan semua bulan (12) dalam tahun tersebut
+        $periode = $query->orderBy('tahun', 'desc')->orderBy('bulan', 'desc')->paginate(12)->withQueryString();
         
+        // Ambil daftar tahun unik yang ada di tabel, tambahkan tahun ini jika kosong
+        $tahuns = PeriodeKas::select('tahun')->distinct()->orderBy('tahun', 'desc')->pluck('tahun');
+        if ($tahuns->isEmpty() && !$tahuns->contains(date('Y'))) {
+            $tahuns = collect([date('Y')]);
+        }
+
         // Array pembantu untuk nama bulan
         $namaBulan = [
             1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 
@@ -30,7 +43,56 @@ class PeriodeKasController extends Controller
             9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
         ];
 
-        return view('admin.periode.index', compact('periode', 'namaBulan'));
+        return view('admin.periode.index', compact('periode', 'namaBulan', 'tahunFilter', 'tahuns'));
+    }
+
+    public function tagihanList(Request $request)
+    {
+        $tahunFilter = $request->input('tahun', date('Y'));
+        $bulanFilter = $request->input('bulan', date('n'));
+        
+        // Cari periode kas berdasarkan filter tahun dan bulan
+        $periode = PeriodeKas::where('tahun', $tahunFilter)
+                             ->where('bulan', $bulanFilter)
+                             ->first();
+
+        $anggotas = User::where('role', 'anggota')->get();
+
+        // Data tunggakan: anggota yang belum bayar atau belum diterima
+        $tunggakan = collect();
+        
+        if ($periode) {
+            $pembayarans = \App\Models\PembayaranKas::where('periode_id', $periode->id)
+                ->get()
+                ->keyBy('anggota_id');
+                
+            foreach ($anggotas as $anggota) {
+                $pembayaran = $pembayarans->get($anggota->id);
+                // Jika belum bayar, ditolak, atau pending -> masuk kategori tagihan/tunggakan
+                if (!$pembayaran || $pembayaran->status != 'diterima') {
+                    $tunggakan->push([
+                        'anggota' => $anggota,
+                        'status' => $pembayaran ? $pembayaran->status : 'belum_bayar'
+                    ]);
+                }
+            }
+        }
+
+        $namaBulan = [
+            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 
+            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus', 
+            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+        ];
+        
+        // Ambil daftar tahun yang ada di database periode_kas
+        $tahuns = PeriodeKas::select('tahun')->distinct()->orderBy('tahun', 'desc')->pluck('tahun');
+        if ($tahuns->isEmpty()) {
+            $tahuns = collect([date('Y')]);
+        }
+        
+        $waSetting = \App\Models\WaSetting::first();
+
+        return view('admin.periode.tagihan_list', compact('tunggakan', 'periode', 'tahunFilter', 'bulanFilter', 'namaBulan', 'tahuns', 'waSetting'));
     }
 
     public function create()
@@ -41,24 +103,53 @@ class PeriodeKasController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'bulan' => 'required|integer|between:1,12',
             'tahun' => 'required|integer|min:2020',
             'nominal_wajib' => 'required|numeric|min:0',
-            'deadline' => 'nullable|date',
-            'status' => 'required|in:aktif,tutup',
         ]);
 
-        // Cek agar tidak ada periode bulan dan tahun yang dobel
-        $cekDobel = PeriodeKas::where('bulan', $request->bulan)
-                              ->where('tahun', $request->tahun)
-                              ->first();
-        if ($cekDobel) {
-            return redirect()->back()->withInput()->with('error', 'Periode untuk bulan dan tahun tersebut sudah ada!');
+        // Create 12 months for the given year
+        for ($i = 1; $i <= 12; $i++) {
+            $cekDobel = PeriodeKas::where('bulan', $i)
+                                  ->where('tahun', $request->tahun)
+                                  ->first();
+            
+            if (!$cekDobel) {
+                $data = [
+                    'bulan' => $i,
+                    'tahun' => $request->tahun,
+                    'nominal_wajib' => $request->nominal_wajib,
+                    'status' => 'aktif',
+                ];
+                
+                if (\Illuminate\Support\Facades\Schema::hasColumn('periode_kas', 'deadline')) {
+                    $data['deadline'] = date('Y-m-t', strtotime($request->tahun . '-' . sprintf('%02d', $i) . '-01'));
+                }
+                
+                PeriodeKas::create($data);
+            }
         }
 
-        PeriodeKas::create($request->all());
+        return redirect()->route('admin.periode.index')->with('success', 'Periode kas (12 bulan) berhasil ditambahkan untuk tahun ' . $request->tahun . '.');
+    }
 
-        return redirect()->route('admin.periode.index')->with('success', 'Periode kas baru berhasil ditambahkan.');
+    public function show($id)
+    {
+        $periode = PeriodeKas::findOrFail($id);
+        
+        $anggotas = User::where('role', 'anggota')->get();
+        
+        // Ambil data pembayaran untuk periode ini, index berdasarkan anggota_id
+        $pembayarans = \App\Models\PembayaranKas::where('periode_id', $id)
+            ->get()
+            ->keyBy('anggota_id');
+            
+        $namaBulan = [
+            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 
+            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus', 
+            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+        ];
+
+        return view('admin.periode.show', compact('periode', 'anggotas', 'pembayarans', 'namaBulan'));
     }
 
     public function edit($id)
@@ -72,22 +163,14 @@ class PeriodeKasController extends Controller
         $periode = PeriodeKas::findOrFail($id);
 
         $request->validate([
-            'bulan' => 'required|integer|between:1,12',
-            'tahun' => 'required|integer|min:2020',
             'nominal_wajib' => 'required|numeric|min:0',
-            'deadline' => 'nullable|date',
             'status' => 'required|in:aktif,tutup',
         ]);
 
-        $cekDobel = PeriodeKas::where('bulan', $request->bulan)
-                              ->where('tahun', $request->tahun)
-                              ->where('id', '!=', $id)
-                              ->first();
-        if ($cekDobel) {
-            return redirect()->back()->withInput()->with('error', 'Periode untuk bulan dan tahun tersebut sudah digunakan!');
-        }
-
-        $periode->update($request->all());
+        $periode->update([
+            'nominal_wajib' => $request->nominal_wajib,
+            'status' => $request->status,
+        ]);
 
         return redirect()->route('admin.periode.index')->with('success', 'Data periode kas berhasil diperbarui.');
     }
