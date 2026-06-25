@@ -18,6 +18,8 @@ return new class extends Migration
             $table->text('template_pembayaran_diterima')->nullable();
             $table->text('template_pembayaran_ditolak')->nullable();
             $table->boolean('is_active')->default(false);
+            $table->integer('tgl_tagihan_otomatis')->nullable()->default(null)->comment('Tanggal otomatis kirim tagihan tiap bulan (1-28)');
+            $table->time('waktu_tagihan_otomatis')->nullable();
             $table->timestamps();
         });
     }

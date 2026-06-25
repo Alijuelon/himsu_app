@@ -13,6 +13,7 @@ return new class extends Migration
             $table->integer('bulan');
             $table->integer('tahun');
             $table->decimal('nominal_wajib', 10, 2);
+            $table->date('deadline')->nullable()->comment('Tenggat waktu pembayaran kas');
             $table->enum('status', ['aktif', 'tutup'])->default('aktif');
             $table->timestamps();
         });

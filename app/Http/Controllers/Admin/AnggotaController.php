@@ -44,7 +44,11 @@ class AnggotaController extends Controller
             'username'     => 'nullable|string|max:50|unique:users',
             'password'     => 'required|string|min:8',
             'no_hp'        => 'nullable|string|max:20',
-            'alamat'       => 'nullable|string',
+            'kabupaten'    => 'required|string|max:255',
+            'kecamatan'    => 'required|string|max:255',
+            'desa'         => 'required|string|max:255',
+            'alamat'       => 'required|string',
+            'jabatan'      => 'required|string|max:255',
         ]);
 
         User::create([
@@ -54,7 +58,12 @@ class AnggotaController extends Controller
             'password'     => Hash::make($request->password),
             'role'         => 'anggota',
             'no_hp'        => $request->no_hp,
+            'provinsi'     => 'Sumatera Utara',
+            'kabupaten'    => $request->kabupaten,
+            'kecamatan'    => $request->kecamatan,
+            'desa'         => $request->desa,
             'alamat'       => $request->alamat,
+            'jabatan'      => $request->jabatan,
         ]);
 
         return redirect()->route('admin.anggota.index')->with('success', 'Data anggota berhasil ditambahkan.');
@@ -77,14 +86,23 @@ class AnggotaController extends Controller
             'email'        => 'required|string|email|max:255|unique:users,email,' . $anggota->id,
             'username'     => 'nullable|string|max:50|unique:users,username,' . $anggota->id,
             'no_hp'        => 'nullable|string|max:20',
-            'alamat'       => 'nullable|string',
+            'kabupaten'    => 'required|string|max:255',
+            'kecamatan'    => 'required|string|max:255',
+            'desa'         => 'required|string|max:255',
+            'alamat'       => 'required|string',
+            'jabatan'      => 'required|string|max:255',
         ]);
 
         $anggota->nama_lengkap = $request->nama_lengkap;
         $anggota->email = $request->email;
         $anggota->username = $request->username;
         $anggota->no_hp = $request->no_hp;
+        $anggota->provinsi = 'Sumatera Utara';
+        $anggota->kabupaten = $request->kabupaten;
+        $anggota->kecamatan = $request->kecamatan;
+        $anggota->desa = $request->desa;
         $anggota->alamat = $request->alamat;
+        $anggota->jabatan = $request->jabatan;
 
         // Jika password diisi, maka update password (jika kosong, biarkan password lama)
         if ($request->filled('password')) {

@@ -1,8 +1,13 @@
 <x-guest-layout>
     <x-auth-session-status class="mb-6 font-bold text-green-600 bg-green-50 p-4 rounded-xl" :status="session('status')" />
 
-    <div class="mb-10 text-center sm:text-left">
-        <h2 class="text-3xl font-extrabold text-darkText dark:text-white">Selamat Datang Kembali 👋</h2>
+    <div class="mb-10 text-center sm:text-left mt-10">
+        <div class="flex items-center justify-center sm:justify-start gap-4 mb-2">
+            <a href="{{ url('/') }}" class="hover:opacity-80 transition-opacity">
+                <img src="{{ asset('images/logo.png') }}" alt="Logo HIMSU KAS" class="w-12 h-12 object-contain drop-shadow-md">
+            </a>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-darkText dark:text-white">Selamat Datang Kembali 👋</h2>
+        </div>
         <p class="text-gray-500 dark:text-gray-400 mt-2 text-sm sm:text-base leading-relaxed">
             Silakan masukkan email dan kata sandi Anda untuk mengakses Dasbor Keuangan Kas Anda.
         </p>

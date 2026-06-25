@@ -8,8 +8,9 @@
        class="fixed inset-y-0 left-0 z-30 w-64 bg-white dark:bg-navy-700 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-auto flex flex-col shadow-xl lg:shadow-none border-r border-gray-100 dark:border-white/5">
     
     <div class="flex items-center justify-center h-24 border-b border-gray-100 dark:border-white/5">
-        <a href="{{ route('dashboard') }}">
-            <h1 class="text-2xl font-bold text-darkText dark:text-white tracking-wide transition-colors">
+        <a href="{{ route('dashboard') }}" class="flex items-center gap-3">
+            <img src="{{ asset('images/logo.png') }}" alt="Logo" class="w-10 h-10 object-contain drop-shadow-md">
+            <h1 class="text-xl font-bold text-darkText dark:text-white tracking-wide transition-colors">
                 HIMSU<span class="text-brand"> KAS</span>
             </h1>
         </a>

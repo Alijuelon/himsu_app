@@ -67,26 +67,12 @@
                                         <span class="text-[9px] mt-1 font-bold uppercase">Lihat PDF</span>
                                     </a>
                                 @else
-                                    <div x-data="{ openImage: false }">
-                                        <button @click="openImage = true" class="relative group block mx-auto overflow-hidden rounded-lg w-16 h-16 border-2 border-gray-200 dark:border-navy-600 hover:border-brand transition">
-                                            <img src="{{ asset('storage/' . $item->bukti_transfer) }}" alt="Bukti" class="object-cover w-full h-full" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
-                                            <div class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
-                                                <i class="fa-solid fa-magnifying-glass text-white text-xs"></i>
-                                            </div>
-                                        </button>
-
-                                        <template x-teleport="body">
-                                            <div x-show="openImage" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                                                <div x-show="openImage" @click="openImage = false" class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm transition-opacity"></div>
-                                                <div x-show="openImage" class="relative max-w-3xl w-full">
-                                                    <button @click="openImage = false" class="absolute -top-10 right-0 text-white hover:text-gray-300">
-                                                        <i class="fa-solid fa-xmark text-2xl"></i>
-                                                    </button>
-                                                    <img src="{{ asset('storage/' . $item->bukti_transfer) }}" class="w-full h-auto rounded-xl shadow-2xl max-h-[80vh] object-contain bg-black/50" onerror="this.src='https://via.placeholder.com/600?text=Gambar+Tidak+Ditemukan'">
-                                                </div>
-                                            </div>
-                                        </template>
-                                    </div>
+                                    <a href="{{ asset('storage/' . $item->bukti_transfer) }}" target="_blank" class="relative group block mx-auto overflow-hidden rounded-lg w-16 h-16 border-2 border-gray-200 dark:border-navy-600 hover:border-brand transition">
+                                        <img src="{{ asset('storage/' . $item->bukti_transfer) }}" alt="Bukti" class="object-cover w-full h-full" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
+                                        <div class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                                            <i class="fa-solid fa-arrow-up-right-from-square text-white text-xs"></i>
+                                        </div>
+                                    </a>
                                 @endif
                             </td>
 

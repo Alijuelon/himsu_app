@@ -19,7 +19,14 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->enum('role', ['admin', 'anggota'])->default('anggota');
+            $table->enum('status_verifikasi', ['pending', 'verified', 'rejected'])->default('pending');
+            $table->enum('tipe_anggota', ['anggota', 'bukan_anggota'])->nullable();
+            $table->string('jabatan')->nullable();
             $table->string('no_hp', 20)->nullable();
+            $table->string('provinsi')->nullable();
+            $table->string('kabupaten')->nullable();
+            $table->string('kecamatan')->nullable();
+            $table->string('desa')->nullable();
             $table->text('alamat')->nullable();
             $table->rememberToken();
             $table->timestamps();

@@ -1,7 +1,12 @@
 <x-guest-layout>
     
-    <div class="mb-10 text-center sm:text-left">
-        <h2 class="text-3xl font-extrabold text-darkText dark:text-white">Pendaftaran Anggota 🎉</h2>
+    <div class="mb-10 text-center sm:text-left mt-10">
+        <div class="flex items-center justify-center sm:justify-start gap-4 mb-2">
+            <a href="{{ url('/') }}" class="hover:opacity-80 transition-opacity">
+                <img src="{{ asset('images/logo.png') }}" alt="Logo HIMSU KAS" class="w-12 h-12 object-contain drop-shadow-md">
+            </a>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-darkText dark:text-white">Pendaftaran Anggota 🎉</h2>
+        </div>
         <p class="text-gray-500 dark:text-gray-400 mt-2 text-sm sm:text-base leading-relaxed">
             Satu langkah lagi untuk bisa mengecek dan memantau uang kas Anda secara mandiri & praktis!
         </p>
@@ -42,15 +47,19 @@
 
         <div class="space-y-2">
             <label for="jabatan" class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                Jabatan / Divisi <span class="text-gray-400 font-normal text-xs">(Opsional)</span>
+                Jabatan / Divisi <span class="text-red-500">*</span>
             </label>
             <div class="relative">
                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <i class="fa-solid fa-briefcase text-gray-400"></i>
                 </div>
-                <input id="jabatan" type="text" name="jabatan" value="{{ old('jabatan') }}" autocomplete="organization-title" 
-                    class="w-full py-3.5 pl-11 pr-4 bg-gray-50 dark:bg-navy-900 border border-transparent hover:border-gray-200 focus:border-transparent dark:border-white/10 dark:hover:border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand font-medium text-gray-800 dark:text-white transition-all placeholder-gray-400 shadow-sm" 
-                    placeholder="Contoh: Anggota Biasa, Divisi Kominfo, dll">
+                <select id="jabatan" name="jabatan" required
+                    class="w-full py-3.5 pl-11 pr-4 bg-gray-50 dark:bg-navy-900 border border-transparent hover:border-gray-200 focus:border-transparent dark:border-white/10 dark:hover:border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand font-medium text-gray-800 dark:text-white transition-all appearance-none shadow-sm">
+                    <option value="" disabled {{ old('jabatan') ? '' : 'selected' }}>-- Pilih Jabatan --</option>
+                    @foreach(['Ketua umum', 'wakil ketua umum', 'sekretaris', 'bendahara', 'ketua devisi kaderisasi', 'anggota devisi kaderisasi', 'ketua devisi hubungan masyarakat', 'anggota devisi hubungan masyarakat', 'ketua devisi keagamaan islam', 'anggota devisi keagamaan islam', 'ketua devisi danus', 'anggota devisi danus', 'ketua devisi kominfo', 'anggota devisi kominfo', 'ketua devisi minat dan bakat', 'anggota devisi minat dan bakat'] as $jab)
+                        <option value="{{ $jab }}" {{ old('jabatan') == $jab ? 'selected' : '' }}>{{ ucwords($jab) }}</option>
+                    @endforeach
+                </select>
             </div>
             <x-input-error :messages="$errors->get('jabatan')" class="mt-1 text-red-500 text-xs font-semibold" />
         </div>

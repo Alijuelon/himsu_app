@@ -51,16 +51,8 @@
             <!-- Left Column: Form Area -->
             <div class="flex-1 flex flex-col justify-center items-center px-6 sm:px-12 lg:px-24 bg-white dark:bg-navy-800 relative z-10 transition-colors duration-300">
                 
-                <div class="w-full max-w-md xl:max-w-lg mb-8 animate-fade-in">
-                    <!-- Logo / Home Link -->
-                    <a href="/" class="inline-flex items-center gap-2 mb-10 hover:opacity-80 transition-opacity">
-                        <div class="w-10 h-10 bg-gradient-to-br from-brand to-[#868CFF] rounded-xl flex items-center justify-center text-white shadow-lg shadow-brand/30">
-                            <i class="fa-solid fa-wallet text-xl"></i>
-                        </div>
-                        <h1 class="text-2xl font-bold text-darkText dark:text-white tracking-wide">
-                            HIMSU<span class="text-brand">KAS</span>
-                        </h1>
-                    </a>
+                <div class="w-full max-w-md xl:max-w-lg mb-10 animate-fade-in">
+              
 
                     <!-- Render Form (Login / Register) -->
                     {{ $slot }}

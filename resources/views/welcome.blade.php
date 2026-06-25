@@ -60,9 +60,7 @@
             <div class="flex justify-between items-center h-20">
                 <!-- Logo -->
                 <div class="flex-shrink-0 flex items-center gap-2">
-                    <div class="w-10 h-10 bg-gradient-to-br from-brand to-[#868CFF] rounded-xl flex items-center justify-center text-white shadow-lg shadow-brand/30">
-                        <i class="fa-solid fa-wallet text-xl"></i>
-                    </div>
+                    <img src="{{ asset('images/logo.png') }}" alt="Logo HIMSU KAS" class="w-12 h-12 object-contain drop-shadow-md">
                     <span class="font-bold text-2xl text-darkText tracking-tight">HIMSU<span class="text-brand">KAS</span></span>
                 </div>
 
@@ -272,9 +270,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row justify-between items-center gap-6">
                 <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 bg-gradient-to-br from-brand to-[#868CFF] rounded-lg flex items-center justify-center text-white">
-                        <i class="fa-solid fa-wallet text-sm"></i>
-                    </div>
+                    <img src="{{ asset('images/logo.png') }}" alt="Logo HIMSU KAS" class="w-8 h-8 object-contain drop-shadow-sm">
                     <span class="font-bold text-xl text-darkText tracking-tight">HIMSU<span class="text-brand">KAS</span></span>
                 </div>
                 
