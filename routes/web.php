@@ -50,6 +50,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     
     // Kelola Pembayaran (Verifikasi dll)
     Route::get('pembayaran', [PembayaranKasController::class, 'index'])->name('pembayaran.index');
+    Route::post('pembayaran/manual', [PembayaranKasController::class, 'storeManual'])->name('pembayaran.storeManual');
     Route::put('pembayaran/{id}/verifikasi', [PembayaranKasController::class, 'verifikasi'])->name('pembayaran.verifikasi');
     Route::post('pembayaran/{id}/resend-notif', [PembayaranKasController::class, 'resendNotif'])->name('pembayaran.resend-notif');
     

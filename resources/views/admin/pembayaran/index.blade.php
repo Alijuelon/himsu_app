@@ -3,10 +3,16 @@
         Verifikasi Pembayaran Kas
     </x-slot>
 
-    <div class="bg-white dark:bg-navy-700 rounded-xl shadow-sm p-6 border border-transparent dark:border-white/5 transition-colors">
+    <div x-data="{ showModalManual: false, search: '{{ request('search') }}', statusFilter: '{{ request('status') }}' }">
+        <div class="bg-white dark:bg-navy-700 rounded-xl shadow-sm p-6 border border-transparent dark:border-white/5 transition-colors">
         
-        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4" x-data="{ search: '{{ request('search') }}', statusFilter: '{{ request('status') }}' }">
-            <h3 class="text-lg font-bold text-darkText dark:text-white">Daftar Setoran Anggota</h3>
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
+            <div class="flex items-center gap-4">
+                <h3 class="text-lg font-bold text-darkText dark:text-white">Daftar Setoran Anggota</h3>
+                <button @click="showModalManual = true" class="bg-brand text-white hover:bg-brandHover px-4 py-2 rounded-xl text-sm font-bold shadow-sm transition flex items-center">
+                    <i class="fa-solid fa-plus mr-2"></i> Bayar Manual
+                </button>
+            </div>
             
             <form action="{{ route('admin.pembayaran.index') }}" method="GET" class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
                 <select name="status" x-model="statusFilter" @change="$el.closest('form').submit()" class="py-2.5 px-4 bg-lightBg dark:bg-navy-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-brand text-gray-700 dark:text-gray-300 transition-all">
@@ -61,7 +67,12 @@
                                     $isPdf = strtolower($ext) === 'pdf';
                                 @endphp
                                 
-                                @if($isPdf)
+                                @if($item->bukti_transfer === 'manual')
+                                    <div class="flex flex-col items-center justify-center p-2 border-2 border-brand/20 dark:border-brand/20 bg-brand/5 dark:bg-brand/10 rounded-lg text-brand w-20 h-16 mx-auto">
+                                        <i class="fa-solid fa-money-bill-wave text-xl mb-1"></i>
+                                        <span class="text-[9px] font-bold uppercase">Cash</span>
+                                    </div>
+                                @elseif($isPdf)
                                     <a href="{{ asset('storage/' . $item->bukti_transfer) }}" target="_blank" class="flex flex-col items-center justify-center p-2 border-2 border-red-200 dark:border-red-900/50 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors text-red-500 w-16 h-16 mx-auto group">
                                         <i class="fa-solid fa-file-pdf text-2xl group-hover:scale-110 transition-transform"></i>
                                         <span class="text-[9px] mt-1 font-bold uppercase">Lihat PDF</span>
@@ -151,7 +162,75 @@
                 {{ $pembayaran->links() }}
             </div>
         @endif
+    </div>
 
+    <!-- Modal Tambah Pembayaran Manual -->
+    <div x-show="showModalManual" style="display: none;" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <!-- Background overlay -->
+            <div x-show="showModalManual" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity dark:bg-navy-900 dark:bg-opacity-80" aria-hidden="true" @click="showModalManual = false"></div>
+
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+            <!-- Modal panel -->
+            <div x-show="showModalManual" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="inline-block align-bottom bg-white dark:bg-navy-800 rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full border border-gray-100 dark:border-white/10">
+                <form action="{{ route('admin.pembayaran.storeManual') }}" method="POST">
+                    @csrf
+                    <div class="bg-white dark:bg-navy-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <div class="sm:flex sm:items-start">
+                            <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-brand/10 dark:bg-brand/20 sm:mx-0 sm:h-10 sm:w-10 text-brand">
+                                <i class="fa-solid fa-money-bill-wave text-xl"></i>
+                            </div>
+                            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                                <h3 class="text-lg leading-6 font-bold text-gray-900 dark:text-white" id="modal-title">
+                                    Catat Pembayaran Kas (Manual)
+                                </h3>
+                                <div class="mt-4 space-y-4">
+                                    <!-- Pilih Anggota -->
+                                    <div>
+                                        <label for="anggota_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Anggota</label>
+                                        <select id="anggota_id" name="anggota_id" required class="w-full bg-lightBg dark:bg-navy-900 border-none rounded-xl text-sm focus:ring-2 focus:ring-brand text-gray-700 dark:text-gray-300">
+                                            <option value="">-- Pilih Anggota --</option>
+                                            @foreach($anggotaList as $anggota)
+                                                <option value="{{ $anggota->id }}">{{ $anggota->nama_lengkap }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <!-- Pilih Periode -->
+                                    <div>
+                                        <label for="periode_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Periode Kas</label>
+                                        <select id="periode_id" name="periode_id" required class="w-full bg-lightBg dark:bg-navy-900 border-none rounded-xl text-sm focus:ring-2 focus:ring-brand text-gray-700 dark:text-gray-300">
+                                            <option value="">-- Pilih Periode --</option>
+                                            @foreach($periodeList as $periode)
+                                                <option value="{{ $periode->id }}">Kas {{ $namaBulan[$periode->bulan] ?? '' }} {{ $periode->tahun }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <!-- Nominal -->
+                                    <div>
+                                        <label for="jumlah_bayar" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nominal (Rp)</label>
+                                        <input type="number" id="jumlah_bayar" name="jumlah_bayar" value="150000" required class="w-full bg-lightBg dark:bg-navy-900 border-none rounded-xl text-sm focus:ring-2 focus:ring-brand text-gray-700 dark:text-gray-300">
+                                    </div>
+                                    <!-- Keterangan -->
+                                    <div>
+                                        <label for="keterangan" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Keterangan (Opsional)</label>
+                                        <input type="text" id="keterangan" name="keterangan" placeholder="Misal: Titip bayar via Admin A" class="w-full bg-lightBg dark:bg-navy-900 border-none rounded-xl text-sm focus:ring-2 focus:ring-brand text-gray-700 dark:text-gray-300">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-navy-800/50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-gray-100 dark:border-white/10">
+                        <button type="submit" class="w-full inline-flex justify-center rounded-xl border border-transparent shadow-sm px-4 py-2 bg-brand text-base font-medium text-white hover:bg-brandHover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand sm:ml-3 sm:w-auto sm:text-sm transition">
+                            Simpan & Terima
+                        </button>
+                        <button type="button" @click="showModalManual = false" class="mt-3 w-full inline-flex justify-center rounded-xl border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-navy-700 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-navy-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition">
+                            Batal
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
     <!-- Script for SweetAlert2 Action -->
@@ -211,4 +290,5 @@
             })
         }
     </script>
+    </div>
 </x-app-layout>

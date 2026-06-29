@@ -30,9 +30,9 @@
         </div>
     </div>
 
-    <div class="bg-white dark:bg-navy-700 rounded-xl shadow-sm p-6 border border-transparent dark:border-white/5 transition-colors" x-data="{ modalTambah: false }">
+    <div class="bg-white dark:bg-navy-700 rounded-xl shadow-sm p-6 border border-transparent dark:border-white/5 transition-colors" x-data="{ modalTambah: false, search: '{{ request('search') }}' }">
         
-        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4" x-data="{ search: '{{ request('search') }}' }">
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
             <h3 class="text-lg font-bold text-darkText dark:text-white">Daftar Pemasukan</h3>
             
             <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">

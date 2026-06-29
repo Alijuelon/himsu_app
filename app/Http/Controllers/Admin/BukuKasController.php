@@ -66,14 +66,14 @@ class BukuKasController extends Controller
             'kategori'        => $request->kategori,
             'tanggal'         => $request->tanggal,
             'nominal'         => $request->nominal,
-            'keterangan'      => $request->keterangan,
+            'keterangan'      => $request->keterangan ?? '-',
             'user_id'         => Auth::id(), // ID Admin yang mencatat
         ];
 
         if ($request->hasFile('bukti_nota')) {
             $file = $request->file('bukti_nota');
             $filename = time() . '_' . $file->getClientOriginalName();
-            $file->storeAs('public/bukti_kas', $filename);
+            $file->storeAs('bukti_kas', $filename, 'public');
             $data['bukti_nota'] = $filename;
         }
 
@@ -102,17 +102,17 @@ class BukuKasController extends Controller
             'kategori'   => $request->kategori,
             'tanggal'    => $request->tanggal,
             'nominal'    => $request->nominal,
-            'keterangan' => $request->keterangan,
+            'keterangan' => $request->keterangan ?? '-',
         ];
 
         if ($request->hasFile('bukti_nota')) {
             // Delete old file if exists
-            if ($transaksi->bukti_nota && Storage::exists('public/bukti_kas/' . $transaksi->bukti_nota)) {
-                Storage::delete('public/bukti_kas/' . $transaksi->bukti_nota);
+            if ($transaksi->bukti_nota && Storage::disk('public')->exists('bukti_kas/' . $transaksi->bukti_nota)) {
+                Storage::disk('public')->delete('bukti_kas/' . $transaksi->bukti_nota);
             }
             $file = $request->file('bukti_nota');
             $filename = time() . '_' . $file->getClientOriginalName();
-            $file->storeAs('public/bukti_kas', $filename);
+            $file->storeAs('bukti_kas', $filename, 'public');
             $data['bukti_nota'] = $filename;
         }
 
@@ -127,8 +127,8 @@ class BukuKasController extends Controller
         $transaksi = BukuKas::findOrFail($id);
         $jenis = $transaksi->jenis_transaksi;
 
-        if ($transaksi->bukti_nota && Storage::exists('public/bukti_kas/' . $transaksi->bukti_nota)) {
-            Storage::delete('public/bukti_kas/' . $transaksi->bukti_nota);
+        if ($transaksi->bukti_nota && Storage::disk('public')->exists('bukti_kas/' . $transaksi->bukti_nota)) {
+            Storage::disk('public')->delete('bukti_kas/' . $transaksi->bukti_nota);
         }
 
         $transaksi->delete();
