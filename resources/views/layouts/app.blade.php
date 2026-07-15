@@ -147,7 +147,7 @@
         </div>
     </div>
     
-    @if(Auth::check() && Auth::user()->role === 'anggota')
+    @if(Auth::check() && in_array(Auth::user()->role, ['anggota', 'ketua']))
     @php
         $userId = Auth::id();
         $periodeSudahDibayar = \App\Models\PembayaranKas::where('anggota_id', $userId)

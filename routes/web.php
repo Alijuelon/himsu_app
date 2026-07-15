@@ -12,6 +12,8 @@ use App\Http\Controllers\Anggota\BayarKasController;
 use App\Http\Controllers\Anggota\RiwayatController;
 use App\Http\Controllers\Admin\PeriodeKasController;
 use App\Http\Controllers\Admin\WaNotificationController;
+use App\Http\Controllers\Ketua\LaporanController as KetuaLaporanController;
+use App\Http\Controllers\Ketua\AnggotaController as KetuaAnggotaController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -34,7 +36,7 @@ Route::middleware('auth')->group(function () {
 // ROUTE KHUSUS ADMIN / BENDAHARA
 // ==========================================
 // Nanti Anda bisa membuat middleware 'role:admin' khusus, sementara ini kita pakai 'auth'
-Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     
     // Kelola Data Anggota
     Route::resource('anggota', AnggotaController::class);
@@ -90,7 +92,22 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 });
 
 // ==========================================
-// ROUTE KHUSUS ANGGOTA
+// ROUTE KHUSUS KETUA UMUM
+// ==========================================
+Route::middleware(['auth', 'role:ketua'])->prefix('ketua')->name('ketua.')->group(function () {
+    
+    // Laporan Keuangan (Read-only + Download PDF)
+    Route::get('laporan', [KetuaLaporanController::class, 'index'])->name('laporan.index');
+    Route::get('laporan/laba-rugi', [KetuaLaporanController::class, 'labaRugi'])->name('laporan.laba-rugi');
+    Route::get('laporan/export-pdf', [KetuaLaporanController::class, 'exportPdf'])->name('laporan.pdf');
+
+    // Data Anggota (Read-only)
+    Route::get('anggota', [KetuaAnggotaController::class, 'index'])->name('anggota.index');
+
+});
+
+// ==========================================
+// ROUTE KHUSUS ANGGOTA (juga digunakan Ketua untuk bayar kas)
 // ==========================================
 Route::middleware(['auth'])->prefix('anggota')->name('anggota.')->group(function () {
     
@@ -100,11 +117,11 @@ Route::middleware(['auth'])->prefix('anggota')->name('anggota.')->group(function
     })->name('unverified');
 
     Route::middleware(['verifikasi'])->group(function () {
-        // Bayar Kas
+        // Bayar Kas (Anggota & Ketua)
         Route::get('bayar', [BayarKasController::class, 'create'])->name('bayar.create');
         Route::post('bayar', [BayarKasController::class, 'store'])->name('bayar.store');
         
-        // Riwayat Pribadi
+        // Riwayat Pribadi (Anggota & Ketua)
         Route::get('riwayat', [RiwayatController::class, 'index'])->name('riwayat.index');
         
         // Info Saldo (Opsional, bisa ditaruh di Dashboard Anggota saja)

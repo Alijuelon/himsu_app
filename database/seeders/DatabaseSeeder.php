@@ -48,5 +48,22 @@ class DatabaseSeeder extends Seeder
             'desa'              => 'Pasar Pangururan',
             'alamat'            => 'Jl. Kelapapati Laut, Bengkalis',
         ]);
+        // 3. Akun Ketua Umum HIMSU
+        User::create([
+            'nama_lengkap'      => 'Ketua Umum HIMSU',
+            'username'          => 'ketua_himsu',
+            'email'             => 'ketua@himsu.com',
+            'password'          => Hash::make('password'),
+            'role'              => 'ketua',
+            'status_verifikasi' => 'verified',
+            'tipe_anggota'      => 'anggota',
+            'jabatan'           => 'Ketua Umum',
+            'no_hp'             => '085311223344',
+            'provinsi'          => 'Sumatera Utara',
+            'kabupaten'         => 'Kabupaten Asahan',
+            'kecamatan'         => 'Kisaran Timur',
+            'desa'              => 'Mutiara',
+            'alamat'            => 'Sekretariat HIMSU Bengkalis',
+        ]);
     }
 }

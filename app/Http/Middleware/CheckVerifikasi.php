@@ -17,7 +17,7 @@ class CheckVerifikasi
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && Auth::user()->role === 'anggota' && Auth::user()->status_verifikasi !== 'verified') {
+        if (Auth::check() && in_array(Auth::user()->role, ['anggota', 'ketua']) && Auth::user()->status_verifikasi !== 'verified') {
             if (!$request->routeIs('anggota.unverified')) {
                 return redirect()->route('anggota.unverified');
             }

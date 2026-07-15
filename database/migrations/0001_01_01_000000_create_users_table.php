@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->enum('role', ['admin', 'anggota'])->default('anggota');
+            $table->enum('role', ['admin', 'anggota', 'ketua'])->default('anggota');
             $table->enum('status_verifikasi', ['pending', 'verified', 'rejected'])->default('pending');
             $table->enum('tipe_anggota', ['anggota', 'bukan_anggota'])->nullable();
             $table->string('jabatan')->nullable();

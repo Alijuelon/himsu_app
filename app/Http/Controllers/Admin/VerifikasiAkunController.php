@@ -10,7 +10,7 @@ class VerifikasiAkunController extends Controller
 {
     public function index()
     {
-        $users = User::where('role', 'anggota')->orderBy('created_at', 'desc')->get();
+        $users = User::whereIn('role', ['anggota', 'ketua'])->orderBy('created_at', 'desc')->get();
         return view('admin.verifikasi-akun', compact('users'));
     }
 

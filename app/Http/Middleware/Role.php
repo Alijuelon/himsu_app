@@ -10,13 +10,14 @@ class Role
 {
     /**
      * Handle an incoming request.
+     * Mendukung satu atau beberapa role, contoh: role:admin,ketua
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, $role): Response
+    public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        if ($request->user()->role != $role) {
-            return redirect('login');
+        if (!in_array($request->user()->role, $roles)) {
+            abort(403, 'Anda tidak memiliki akses ke halaman ini.');
         }
 
         return $next($request);
