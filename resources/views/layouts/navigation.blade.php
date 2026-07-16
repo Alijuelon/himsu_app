@@ -206,6 +206,15 @@
             </div>
         </div>
 
+        <!-- Menu Info Saldo (Khusus Ketua) -->
+        <x-nav-link :href="route('anggota.saldo.index')" :active="request()->routeIs('anggota.saldo.*')" class="flex items-center px-4 py-3 mt-2 {{ request()->routeIs('anggota.saldo.*') ? 'bg-lightBg dark:bg-white/5 text-brand dark:text-brand font-semibold' : 'text-gray-500 dark:text-gray-400 font-medium hover:text-brand dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5' }} rounded-xl transition-colors relative w-full border-none">
+            @if(request()->routeIs('anggota.saldo.*'))
+                <div class="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-1 bg-brand rounded-l-full"></div>
+            @endif
+            <i class="fa-solid fa-wallet w-5 text-center text-lg"></i>
+            <span class="mx-3">Info Saldo</span>
+        </x-nav-link>
+
     @else
         <p class="px-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">Menu Anggota</p>
         
