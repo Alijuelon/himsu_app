@@ -98,27 +98,11 @@ class DashboardController extends Controller
             'pengeluaran' => array_values($monthlyPengeluaran),
         ];
 
-        // === DATA SEBAGAI ANGGOTA (Pembayaran Kas Pribadi) ===
-        $totalDibayar = PembayaranKas::where('anggota_id', $userId)
-                                     ->where('status', 'diterima')
-                                     ->sum('jumlah_bayar');
 
-        $menungguVerifikasi = PembayaranKas::where('anggota_id', $userId)
-                                           ->where('status', 'pending')
-                                           ->count();
-
-        $riwayatTerbaru = PembayaranKas::with('periode')
-                                       ->where('anggota_id', $userId)
-                                       ->latest()
-                                       ->take(5)
-                                       ->get();
-
-        $tagihanAktif = PeriodeKas::where('status', 'aktif')->count();
 
         return view('ketua.dashboard', compact(
             'totalPemasukan', 'totalPengeluaran', 'saldoKas', 'jumlahAnggota',
-            'transaksiTerbaru', 'chartData', 'currentYear',
-            'totalDibayar', 'menungguVerifikasi', 'riwayatTerbaru', 'tagihanAktif'
+            'transaksiTerbaru', 'chartData', 'currentYear'
         ));
     }
 
