@@ -122,7 +122,7 @@
                             </td>
                             <td class="py-4 px-4 text-center">
                                 @if($item->bukti_nota)
-                                    <a href="{{ asset('storage/bukti_kas/' . $item->bukti_nota) }}" target="_blank" class="inline-flex items-center justify-center p-2 bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-500/20 transition" title="Lihat Bukti">
+                                    <a href="{{ route('bukukas.bukti.show', ['path' => 'bukti_kas/' . $item->bukti_nota, 't' => time()]) }}" target="_blank" class="inline-flex items-center justify-center p-2 bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-500/20 transition" title="Lihat Bukti">
                                         <i class="fa-solid fa-file-invoice"></i>
                                     </a>
                                 @else
@@ -201,7 +201,7 @@
                                                                             @if(Str::endsWith($item->bukti_nota, ['.pdf', '.PDF']))
                                                                                 <i class="fa-solid fa-file-pdf text-red-500 text-xl"></i>
                                                                             @else
-                                                                                <img src="{{ asset('storage/bukti_kas/'.$item->bukti_nota) }}" class="w-full h-full object-cover">
+                                                                                <img src="{{ route('bukukas.bukti.show', ['path' => 'bukti_kas/' . $item->bukti_nota, 't' => time()]) }}" class="w-full h-full object-cover">
                                                                             @endif
                                                                         </template>
                                                                     </div>

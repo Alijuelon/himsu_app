@@ -44,14 +44,32 @@
                             </td>
                             
                             <td class="py-4 px-4 text-center">
-                                @if(Str::endsWith(strtolower($item->bukti_transfer), '.pdf'))
-                                    <a href="{{ asset('storage/' . $item->bukti_transfer) }}" target="_blank" class="inline-flex flex-col items-center justify-center p-2 w-14 h-14 rounded-lg border border-gray-200 dark:border-navy-600 bg-gray-50 dark:bg-navy-800 hover:border-red-400 transition group">
+                                @php
+                                    $isPdf = Str::endsWith(strtolower($item->bukti_transfer ?? ''), '.pdf');
+                                    $isManual = $item->bukti_transfer === 'manual';
+                                    $fileExists = !$isManual && $item->bukti_transfer
+                                        && \Illuminate\Support\Facades\Storage::disk('public')->exists($item->bukti_transfer);
+                                @endphp
+
+                                @if($isManual)
+                                    <div class="flex flex-col items-center justify-center p-2 border-2 border-brand/20 dark:border-brand/20 bg-brand/5 dark:bg-brand/10 rounded-lg text-brand w-16 h-14 mx-auto">
+                                        <i class="fa-solid fa-money-bill-wave text-lg mb-1"></i>
+                                        <span class="text-[9px] font-bold uppercase">Cash</span>
+                                    </div>
+                                @elseif(!$fileExists)
+                                    <div class="flex flex-col items-center justify-center p-2 border-2 border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-navy-900 rounded-lg text-gray-400 w-16 h-14 mx-auto" title="File bukti tidak ditemukan di server">
+                                        <i class="fa-solid fa-file-circle-question text-lg mb-1"></i>
+                                        <span class="text-[9px] font-bold uppercase">Tdk Ada</span>
+                                    </div>
+                                @elseif($isPdf)
+                                    <a href="{{ route('anggota.bukti.show', ['path' => $item->bukti_transfer, 't' => time()]) }}" target="_blank" class="inline-flex flex-col items-center justify-center p-2 w-14 h-14 rounded-lg border border-gray-200 dark:border-navy-600 bg-gray-50 dark:bg-navy-800 hover:border-red-400 transition group">
                                         <i class="fa-solid fa-file-pdf text-xl text-red-500 mb-1 group-hover:scale-110 transition-transform"></i>
+                                        <span class="text-[9px] font-bold uppercase text-gray-400">PDF</span>
                                     </a>
                                 @else
                                     <div x-data="{ openImage: false }">
                                         <button @click="openImage = true" type="button" class="relative group block mx-auto overflow-hidden rounded-lg w-14 h-14 border border-gray-200 dark:border-navy-600 hover:border-brand transition">
-                                            <img src="{{ asset('storage/' . $item->bukti_transfer) }}" alt="Bukti" class="object-cover w-full h-full" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
+                                            <img src="{{ route('anggota.bukti.show', ['path' => $item->bukti_transfer, 't' => time()]) }}" alt="Bukti" class="object-cover w-full h-full" onerror="this.parentElement.innerHTML='<div class=\'flex items-center justify-center w-full h-full bg-gray-100 dark:bg-navy-900 rounded-lg\'><i class=\'fa-solid fa-image-slash text-gray-400\'></i></div>'">
                                             <div class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
                                                 <i class="fa-solid fa-magnifying-glass text-white text-xs"></i>
                                             </div>
@@ -64,7 +82,7 @@
                                                     <button type="button" @click="openImage = false" class="absolute -top-10 right-0 text-white hover:text-gray-300">
                                                         <i class="fa-solid fa-xmark text-2xl"></i>
                                                     </button>
-                                                    <img src="{{ asset('storage/' . $item->bukti_transfer) }}" class="w-full h-auto rounded-xl shadow-2xl max-h-[80vh] object-contain bg-black/50">
+                                                    <img src="{{ route('anggota.bukti.show', ['path' => $item->bukti_transfer, 't' => time()]) }}" class="w-full h-auto rounded-xl shadow-2xl max-h-[80vh] object-contain bg-black/50">
                                                 </div>
                                             </div>
                                         </template>

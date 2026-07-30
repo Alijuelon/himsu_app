@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\PeriodeKasController;
 use App\Http\Controllers\Admin\WaNotificationController;
 use App\Http\Controllers\Ketua\LaporanController as KetuaLaporanController;
 use App\Http\Controllers\Ketua\AnggotaController as KetuaAnggotaController;
+use App\Http\Controllers\BuktiTransferController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -23,6 +24,12 @@ Route::get('/', function () {
 // ROUTE DASHBOARD (Akan diarahkan sesuai role oleh Controller)
 Route::middleware(['auth', 'verified', 'verifikasi'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // ROUTE SERVE FILE STORAGE (mengatasi 403 pada PHP built-in server di Windows)
+    // Semua file di storage (bukti_transfer, bukti_kas, dll) diserve via Laravel
+    Route::get('/bukti', [BuktiTransferController::class, 'show'])->name('admin.bukti.show');
+    Route::get('/anggota/bukti', [BuktiTransferController::class, 'show'])->name('anggota.bukti.show');
+    Route::get('/bukukas/bukti', [BuktiTransferController::class, 'show'])->name('bukukas.bukti.show');
 });
 
 // ROUTE PROFIL (Bawaan Breeze)
@@ -129,5 +136,25 @@ Route::middleware(['auth'])->prefix('anggota')->name('anggota.')->group(function
     });
 
 });
+
+// Route publik untuk intercept /storage/* agar tidak 403
+// (fallback untuk URL lama yang masih menggunakan asset('storage/...'))
+Route::get('/storage/{folder}/{filename}', function ($folder, $filename) {
+    $path = $folder . '/' . $filename;
+    $allowedFolders = ['bukti_transfer', 'bukti_kas'];
+    if (!in_array($folder, $allowedFolders)) {
+        abort(403);
+    }
+    if (!\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
+        abort(404);
+    }
+    $file     = \Illuminate\Support\Facades\Storage::disk('public')->get($path);
+    $mimeType = \Illuminate\Support\Facades\Storage::disk('public')->mimeType($path) ?: 'application/octet-stream';
+    return response($file, 200, [
+        'Content-Type'        => $mimeType,
+        'Content-Disposition' => 'inline; filename="' . $filename . '"',
+        'Cache-Control'       => 'private, max-age=86400',
+    ]);
+})->where(['folder' => '[a-zA-Z0-9_\-]+', 'filename' => '[a-zA-Z0-9_\-\.]+'])->name('storage.file');
 
 require __DIR__.'/auth.php';

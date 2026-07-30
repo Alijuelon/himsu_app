@@ -65,6 +65,8 @@
                                 @php 
                                     $ext = pathinfo($item->bukti_transfer, PATHINFO_EXTENSION); 
                                     $isPdf = strtolower($ext) === 'pdf';
+                                    $fileExists = $item->bukti_transfer && $item->bukti_transfer !== 'manual'
+                                        && \Illuminate\Support\Facades\Storage::disk('public')->exists($item->bukti_transfer);
                                 @endphp
                                 
                                 @if($item->bukti_transfer === 'manual')
@@ -72,14 +74,19 @@
                                         <i class="fa-solid fa-money-bill-wave text-xl mb-1"></i>
                                         <span class="text-[9px] font-bold uppercase">Cash</span>
                                     </div>
+                                @elseif(!$fileExists)
+                                    <div class="flex flex-col items-center justify-center p-2 border-2 border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-navy-900 rounded-lg text-gray-400 w-20 h-16 mx-auto" title="File bukti tidak ditemukan">
+                                        <i class="fa-solid fa-file-circle-question text-xl mb-1"></i>
+                                        <span class="text-[9px] font-bold uppercase">Tdk Ada</span>
+                                    </div>
                                 @elseif($isPdf)
-                                    <a href="{{ asset('storage/' . $item->bukti_transfer) }}" target="_blank" class="flex flex-col items-center justify-center p-2 border-2 border-red-200 dark:border-red-900/50 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors text-red-500 w-16 h-16 mx-auto group">
+                                    <a href="{{ route('admin.bukti.show', ['path' => $item->bukti_transfer, 't' => time()]) }}" target="_blank" class="flex flex-col items-center justify-center p-2 border-2 border-red-200 dark:border-red-900/50 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors text-red-500 w-16 h-16 mx-auto group">
                                         <i class="fa-solid fa-file-pdf text-2xl group-hover:scale-110 transition-transform"></i>
                                         <span class="text-[9px] mt-1 font-bold uppercase">Lihat PDF</span>
                                     </a>
                                 @else
-                                    <a href="{{ asset('storage/' . $item->bukti_transfer) }}" target="_blank" class="relative group block mx-auto overflow-hidden rounded-lg w-16 h-16 border-2 border-gray-200 dark:border-navy-600 hover:border-brand transition">
-                                        <img src="{{ asset('storage/' . $item->bukti_transfer) }}" alt="Bukti" class="object-cover w-full h-full" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
+                                    <a href="{{ route('admin.bukti.show', ['path' => $item->bukti_transfer, 't' => time()]) }}" target="_blank" class="relative group block mx-auto overflow-hidden rounded-lg w-16 h-16 border-2 border-gray-200 dark:border-navy-600 hover:border-brand transition">
+                                        <img src="{{ route('admin.bukti.show', ['path' => $item->bukti_transfer, 't' => time()]) }}" alt="Bukti" class="object-cover w-full h-full" onerror="this.parentElement.innerHTML='<div class=\'flex items-center justify-center w-full h-full bg-gray-100 dark:bg-navy-900\'><i class=\'fa-solid fa-image-slash text-gray-400\'></i></div>'">
                                         <div class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
                                             <i class="fa-solid fa-arrow-up-right-from-square text-white text-xs"></i>
                                         </div>
@@ -130,14 +137,38 @@
                                         </form>
                                     </div>
                                 @else
-                                    <div class="flex flex-col items-center">
-                                        <span class="text-gray-400 text-xs italic mb-2">Selesai diverifikasi</span>
+                                    <div class="flex flex-col items-center gap-1.5">
+                                        <span class="text-gray-400 text-xs italic">Selesai diverifikasi</span>
                                         <form action="{{ route('admin.pembayaran.resend-notif', $item->id) }}" method="POST">
                                             @csrf
                                             <button type="submit" class="py-1.5 px-2 bg-brand/10 text-brand hover:bg-brand/20 dark:bg-brand/20 dark:text-brand dark:hover:bg-brand/30 rounded-lg transition font-bold text-[10px] flex items-center shadow-sm" onclick="return confirm('Kirim ulang notifikasi WhatsApp kuitansi/penolakan ke anggota ini?')">
                                                 <i class="fa-brands fa-whatsapp mr-1"></i> Kirim Ulang Notif
                                             </button>
                                         </form>
+                                        @if(!$fileExists && $item->bukti_transfer !== 'manual')
+                                            {{-- Tombol upload ulang jika file bukti hilang --}}
+                                            <div x-data="{ showUpload: false }">
+                                                <button @click="showUpload = !showUpload" type="button" class="py-1.5 px-2 bg-orange-50 text-orange-600 hover:bg-orange-100 dark:bg-orange-500/10 dark:text-orange-400 dark:hover:bg-orange-500/20 rounded-lg transition font-bold text-[10px] flex items-center shadow-sm">
+                                                    <i class="fa-solid fa-upload mr-1"></i> Upload Ulang Bukti
+                                                </button>
+                                                <div x-show="showUpload" x-transition class="mt-2">
+                                                    <form action="{{ route('admin.pembayaran.upload-bukti', $item->id) }}" method="POST" enctype="multipart/form-data">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <div class="flex items-center gap-1">
+                                                            <label class="cursor-pointer bg-gray-100 dark:bg-navy-900 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1 text-[10px] text-gray-500 hover:border-brand hover:text-brand transition">
+                                                                <i class="fa-solid fa-file-arrow-up mr-1"></i>Pilih File
+                                                                <input type="file" name="bukti_transfer" class="sr-only" accept=".jpg,.jpeg,.png,.pdf" required onchange="this.closest('label').nextElementSibling.textContent = this.files[0]?.name || ''">
+                                                            </label>
+                                                        </div>
+                                                        <p class="text-[9px] text-gray-400 mt-0.5 truncate max-w-[120px]" id="fn-{{ $item->id }}"></p>
+                                                        <button type="submit" class="mt-1 w-full py-1 bg-orange-500 text-white text-[10px] font-bold rounded-lg hover:bg-orange-600 transition">
+                                                            <i class="fa-solid fa-check mr-1"></i>Upload
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        @endif
                                     </div>
                                 @endif
                             </td>
