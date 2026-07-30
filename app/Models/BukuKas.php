@@ -19,11 +19,18 @@ class BukuKas extends Model
         'keterangan',
         'bukti_nota',
         'user_id',
+        'pembayaran_kas_id',
     ];
 
     // Relasi: Transaksi ini dicatat oleh admin siapa?
     public function pencatat()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    // Relasi: Pemasukan ini berasal dari pembayaran kas anggota?
+    public function pembayaranKas()
+    {
+        return $this->belongsTo(PembayaranKas::class, 'pembayaran_kas_id');
     }
 }

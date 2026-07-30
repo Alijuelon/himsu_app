@@ -15,6 +15,16 @@ class BukuKasController extends Controller
     {
         $query = BukuKas::where('jenis_transaksi', 'pemasukan')->with('pencatat');
 
+        // Filter Bulan
+        if ($request->filled('bulan')) {
+            $query->whereMonth('tanggal', $request->bulan);
+        }
+
+        // Filter Tahun
+        if ($request->filled('tahun')) {
+            $query->whereYear('tanggal', $request->tahun);
+        }
+
         if ($request->has('search') && $request->search != '') {
             $query->where(function($q) use ($request) {
                 $q->where('kategori', 'like', '%' . $request->search . '%')
@@ -23,7 +33,16 @@ class BukuKasController extends Controller
         }
 
         $pemasukan = $query->orderBy('tanggal', 'desc')->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
-        $totalPemasukan = BukuKas::where('jenis_transaksi', 'pemasukan')->sum('nominal');
+
+        // Total juga harus ikut filter
+        $totalQuery = BukuKas::where('jenis_transaksi', 'pemasukan');
+        if ($request->filled('bulan')) {
+            $totalQuery->whereMonth('tanggal', $request->bulan);
+        }
+        if ($request->filled('tahun')) {
+            $totalQuery->whereYear('tanggal', $request->tahun);
+        }
+        $totalPemasukan = $totalQuery->sum('nominal');
 
         return view('admin.bukukas.pemasukan', compact('pemasukan', 'totalPemasukan'));
     }
@@ -33,6 +52,16 @@ class BukuKasController extends Controller
     {
         $query = BukuKas::where('jenis_transaksi', 'pengeluaran')->with('pencatat');
 
+        // Filter Bulan
+        if ($request->filled('bulan')) {
+            $query->whereMonth('tanggal', $request->bulan);
+        }
+
+        // Filter Tahun
+        if ($request->filled('tahun')) {
+            $query->whereYear('tanggal', $request->tahun);
+        }
+
         if ($request->has('search') && $request->search != '') {
             $query->where(function($q) use ($request) {
                 $q->where('kategori', 'like', '%' . $request->search . '%')
@@ -41,7 +70,16 @@ class BukuKasController extends Controller
         }
 
         $pengeluaran = $query->orderBy('tanggal', 'desc')->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
-        $totalPengeluaran = BukuKas::where('jenis_transaksi', 'pengeluaran')->sum('nominal');
+
+        // Total juga harus ikut filter
+        $totalQuery = BukuKas::where('jenis_transaksi', 'pengeluaran');
+        if ($request->filled('bulan')) {
+            $totalQuery->whereMonth('tanggal', $request->bulan);
+        }
+        if ($request->filled('tahun')) {
+            $totalQuery->whereYear('tanggal', $request->tahun);
+        }
+        $totalPengeluaran = $totalQuery->sum('nominal');
 
         return view('admin.bukukas.pengeluaran', compact('pengeluaran', 'totalPengeluaran'));
     }

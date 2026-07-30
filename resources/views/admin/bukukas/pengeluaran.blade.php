@@ -20,12 +20,23 @@
         </div>
     @endif
 
+    @php
+        $namaBulanFilter = [1=>'Januari', 2=>'Februari', 3=>'Maret', 4=>'April', 5=>'Mei', 6=>'Juni', 7=>'Juli', 8=>'Agustus', 9=>'September', 10=>'Oktober', 11=>'November', 12=>'Desember'];
+    @endphp
+
     <div class="mb-6 flex items-center p-5 bg-gradient-to-r from-red-500 to-red-400 rounded-xl shadow-sm text-white border border-transparent dark:border-white/5">
         <div class="p-4 bg-white/20 rounded-full backdrop-blur-sm">
             <i class="fa-solid fa-arrow-trend-down text-2xl w-6 text-center"></i>
         </div>
         <div class="ml-4">
-            <h4 class="text-sm font-medium text-red-50">Total Pengeluaran Keseluruhan</h4>
+            <h4 class="text-sm font-medium text-red-50">
+                Total Pengeluaran
+                @if(request('bulan') || request('tahun'))
+                    — {{ request('bulan') ? $namaBulanFilter[(int)request('bulan')] : '' }} {{ request('tahun') ?? '' }}
+                @else
+                    Keseluruhan
+                @endif
+            </h4>
             <div class="text-3xl font-bold mt-1">Rp {{ number_format($totalPengeluaran, 0, ',', '.') }}</div>
         </div>
     </div>
@@ -35,8 +46,38 @@
         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
             <h3 class="text-lg font-bold text-darkText dark:text-white">Daftar Pengeluaran</h3>
             
-            <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+            <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto items-center">
+                {{-- Filter Bulan & Tahun --}}
+                <form action="{{ route('admin.bukukas.pengeluaran') }}" method="GET" class="flex gap-2 items-center">
+                    @if(request('search'))
+                        <input type="hidden" name="search" value="{{ request('search') }}">
+                    @endif
+                    <select name="bulan" onchange="this.form.submit()" class="py-2.5 px-3 bg-lightBg dark:bg-navy-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-red-500 text-gray-700 dark:text-gray-300 transition-all cursor-pointer">
+                        <option value="">Semua Bulan</option>
+                        @foreach([1=>'Jan', 2=>'Feb', 3=>'Mar', 4=>'Apr', 5=>'Mei', 6=>'Jun', 7=>'Jul', 8=>'Ags', 9=>'Sep', 10=>'Okt', 11=>'Nov', 12=>'Des'] as $num => $nama)
+                            <option value="{{ $num }}" {{ request('bulan') == $num ? 'selected' : '' }}>{{ $nama }}</option>
+                        @endforeach
+                    </select>
+                    <select name="tahun" onchange="this.form.submit()" class="py-2.5 px-3 bg-lightBg dark:bg-navy-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-red-500 text-gray-700 dark:text-gray-300 transition-all cursor-pointer">
+                        <option value="">Semua Tahun</option>
+                        @for($y = date('Y'); $y >= date('Y') - 5; $y--)
+                            <option value="{{ $y }}" {{ request('tahun') == $y ? 'selected' : '' }}>{{ $y }}</option>
+                        @endfor
+                    </select>
+                    @if(request('bulan') || request('tahun'))
+                        <a href="{{ route('admin.bukukas.pengeluaran', request('search') ? ['search' => request('search')] : []) }}" class="p-2.5 bg-red-50 dark:bg-red-500/10 text-red-500 rounded-xl hover:bg-red-100 dark:hover:bg-red-500/20 transition" title="Reset Filter">
+                            <i class="fa-solid fa-filter-circle-xmark"></i>
+                        </a>
+                    @endif
+                </form>
+
                 <form action="{{ route('admin.bukukas.pengeluaran') }}" method="GET" class="relative w-full sm:w-64">
+                    @if(request('bulan'))
+                        <input type="hidden" name="bulan" value="{{ request('bulan') }}">
+                    @endif
+                    @if(request('tahun'))
+                        <input type="hidden" name="tahun" value="{{ request('tahun') }}">
+                    @endif
                     <input type="text" name="search" x-model="search" placeholder="Cari kategori/keterangan..." 
                            class="w-full pl-10 pr-10 py-2.5 bg-lightBg dark:bg-navy-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-red-500 text-gray-700 dark:text-gray-300 transition-all placeholder-gray-400">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

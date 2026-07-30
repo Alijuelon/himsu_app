@@ -53,7 +53,7 @@
                 <i class="fa-solid fa-bell text-2xl w-6 text-center"></i>
             </div>
             <div class="ml-4">
-                <h4 class="text-sm font-medium text-gray-400">Periode Tagihan Aktif</h4>
+                <h4 class="text-sm font-medium text-gray-400">Tunggakan Kas</h4>
                 <div class="text-xl font-bold text-darkText dark:text-white mt-1">
                     {{ $tagihanAktif }} Bulan
                 </div>

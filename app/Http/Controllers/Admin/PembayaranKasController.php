@@ -87,6 +87,7 @@ class PembayaranKasController extends Controller
                 'nominal'       => $pembayaran->jumlah_bayar,
                 'keterangan'    => 'Setoran kas periode ' . $pembayaran->periode->bulan . '/' . $pembayaran->periode->tahun . ' dari ' . $pembayaran->anggota->nama_lengkap . ' (Cash)',
                 'user_id'       => Auth::id(),
+                'pembayaran_kas_id' => $pembayaran->id,
             ]);
 
             DB::commit();
@@ -159,6 +160,7 @@ class PembayaranKasController extends Controller
                     'nominal'       => $pembayaran->jumlah_bayar,
                     'keterangan'    => 'Setoran kas periode ' . $pembayaran->periode->bulan . '/' . $pembayaran->periode->tahun . ' dari ' . $pembayaran->anggota->nama_lengkap,
                     'user_id'       => Auth::id(),
+                    'pembayaran_kas_id' => $pembayaran->id,
                 ]);
             }
 

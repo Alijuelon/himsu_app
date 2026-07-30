@@ -39,4 +39,10 @@ class PembayaranKas extends Model
     {
         return $this->belongsTo(User::class, 'verifikator_id');
     }
+
+    // Relasi: Pembayaran ini tercatat sebagai entri di buku kas?
+    public function bukuKas()
+    {
+        return $this->hasOne(BukuKas::class, 'pembayaran_kas_id');
+    }
 }

@@ -130,8 +130,15 @@ class DashboardController extends Controller
                                        ->take(5)
                                        ->get();
 
-        // 4. Cek apakah ada periode tagihan yang aktif bulan ini
-        $tagihanAktif = PeriodeKas::where('status', 'aktif')->count();
+        // 4. Hitung jumlah bulan tunggakan (periode aktif yang BELUM dibayar oleh anggota ini)
+        $periodeAktifIds = PeriodeKas::where('status', 'aktif')->pluck('id');
+
+        $periodeSudahBayar = PembayaranKas::where('anggota_id', $userId)
+            ->whereIn('status', ['diterima', 'pending'])
+            ->whereIn('periode_id', $periodeAktifIds)
+            ->pluck('periode_id');
+
+        $tagihanAktif = $periodeAktifIds->diff($periodeSudahBayar)->count();
 
         // Lempar ke view anggota
         return view('anggota.dashboard', compact('totalDibayar', 'menungguVerifikasi', 'riwayatTerbaru', 'tagihanAktif'));
